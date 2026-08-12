@@ -163,20 +163,135 @@
       </section>
 
       <!-- 2. Sobre mim -->
-      <section id="sobre" aria-labelledby="titulo-sobre">
-        <h2 id="titulo-sobre">Sobre mim</h2>
-        <p>[SUA TRAJETÓRIA, FORMAÇÃO E MOTIVAÇÃO — placeholder]</p>
+      <section id="sobre" aria-labelledby="titulo-sobre" class="container-main py-section">
+        <header class="max-w-2xl">
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">01 — Sobre</p>
+          <h2 id="titulo-sobre" class="mt-3 text-3xl tracking-tight sm:text-4xl">Sobre mim</h2>
+        </header>
+
+        <div class="mt-8 max-w-3xl space-y-4 text-muted">
+          <p>
+            [BREVE TEXTO SOBRE SUA TRAJETÓRIA — placeholder. Ex.: sua relação com a tecnologia e o que te levou ao desenvolvimento.]
+          </p>
+          <p>
+            [O QUE VOCÊ BUSCA — placeholder. Ex.: área de interesse, tipo de projetos, aprendizado contínuo.]
+          </p>
+        </div>
       </section>
 
-      <!-- 3. Tecnologias -->
-      <section id="tecnologias" aria-labelledby="titulo-tecnologias">
-        <h2 id="titulo-tecnologias">Tecnologias</h2>
-        <p>[TECNOLOGIAS QUE VOCÊ USA OU ESTUDA — placeholder]</p>
-        <ul>
-          <li>[TECNOLOGIA 1]</li>
-          <li>[TECNOLOGIA 2]</li>
-          <li>[TECNOLOGIA 3]</li>
-        </ul>
+      <!-- 3. Stack (Tecnologias)
+           INDICADOR DE NÍVEL: o ponto à direita de cada tecnologia mostra o nível.
+           Por padrão está "conhecimento" (bg-muted). Para classificar, troque a classe:
+           bg-primary = experiência · bg-primary-light = estudo · bg-accent = interesse
+           E atualize o atributo title com o nível real. -->
+      <section id="tecnologias" aria-labelledby="titulo-tecnologias" class="container-main py-section">
+        <header class="max-w-2xl">
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">02 — Stack</p>
+          <h2 id="titulo-tecnologias" class="mt-3 text-3xl tracking-tight sm:text-4xl">Stack</h2>
+          <p class="mt-4 text-muted">
+            [DESCRIÇÃO CURTA SOBRE SUA STACK — placeholder. Ex.: ferramentas do dia a dia e o que estou estudando.]
+          </p>
+        </header>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-3">
+          <!-- Backend -->
+          <article class="rounded-xl border border-border bg-surface p-6">
+            <div class="flex items-center gap-3">
+              <i data-lucide="server" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+              <h3 class="text-lg">Backend</h3>
+            </div>
+            <ul class="mt-6 space-y-3 text-sm">
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Java</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Spring Boot</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Node.js</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Python</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Django</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+            </ul>
+          </article>
+
+          <!-- Frontend -->
+          <article class="rounded-xl border border-border bg-surface p-6">
+            <div class="flex items-center gap-3">
+              <i data-lucide="code-2" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+              <h3 class="text-lg">Frontend</h3>
+            </div>
+            <ul class="mt-6 space-y-3 text-sm">
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">HTML5</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">CSS3</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">JavaScript</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">React</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Bootstrap</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+            </ul>
+          </article>
+
+          <!-- Tools -->
+          <article class="rounded-xl border border-border bg-surface p-6">
+            <div class="flex items-center gap-3">
+              <i data-lucide="wrench" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+              <h3 class="text-lg">Tools</h3>
+            </div>
+            <ul class="mt-6 space-y-3 text-sm">
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Git</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">GitHub</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Docker</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">VS Code</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">IntelliJ IDEA</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+              </li>
+            </ul>
+          </article>
+        </div>
+
+        <!-- Legenda de níveis (o amarelo aparece apenas no ponto de "Interesse") -->
+        <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
+          <span class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-muted"></span> Conhecimento</span>
+          <span class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-primary"></span> Experiência</span>
+          <span class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-primary-light"></span> Estudo</span>
+          <span class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> Interesse</span>
+        </div>
       </section>
 
       <!-- 4. Projetos -->

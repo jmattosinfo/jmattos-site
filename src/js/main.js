@@ -1,11 +1,23 @@
 // Ponto de entrada do JavaScript.
-import { createIcons } from "lucide";
+import { createIcons, Menu, X, ArrowRight, Mail, Server, Code2, Wrench } from "lucide";
 import "../css/style.css";
 
 // ---------- Ícones Lucide ----------
-// Substitui cada <i data-lucide="..."> pelo SVG correspondente (menu, x, etc.).
+// Substitui cada <i data-lucide="..."> pelo SVG correspondente.
+// Importamos SOMENTE os ícones usados (tree-shaking) e mapeamos por nome
+// PascalCase — é assim que o createIcons resolve o data-lucide (ex.: "code-2" → Code2).
 // As classes dos elementos <i> são preservadas no SVG gerado.
-createIcons();
+createIcons({
+  icons: {
+    Menu,
+    X,
+    ArrowRight,
+    Mail,
+    Server,
+    Code2,
+    Wrench,
+  },
+});
 
 // ---------- Menu mobile (hamburger) ----------
 const menuToggle = document.querySelector("[data-menu-toggle]");

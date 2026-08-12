@@ -22,10 +22,227 @@
   </head>
 
   <body>
-    <!-- Conteúdo temporário de teste do ambiente. Será removido nas próximas etapas. -->
-    <div id="app">
-      <p>JMATTOS.DEV — ambiente Vite + Tailwind v4 configurado</p>
-    </div>
+    <!-- Acessibilidade: link que pula a navegação e vai direto ao conteúdo principal.
+         Fica oculto (sr-only) e aparece ao receber foco (ex.: ao navegar com Tab). -->
+    <a
+      href="#conteudo"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-background focus:px-4 focus:py-2 focus:text-foreground"
+    >
+      Pular para o conteúdo
+    </a>
+
+    <!-- ======================= CABEÇALHO / NAVBAR ======================= -->
+    <header class="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
+      <div class="container-main flex h-16 items-center justify-between">
+        <!-- Marca (logotipo) — âncora para o topo; ".DEV" em amarelo = micro-acento -->
+        <a href="#hero" class="font-display text-base font-semibold tracking-tight">
+          JMATTOS<span class="text-accent">.DEV</span>
+        </a>
+
+        <!-- Navegação desktop (visível a partir de md) -->
+        <nav aria-label="Navegação principal" class="hidden md:block">
+          <ul class="flex items-center gap-8">
+            <li><a href="#sobre" class="text-sm text-muted transition-colors hover:text-foreground">Sobre</a></li>
+            <li><a href="#tecnologias" class="text-sm text-muted transition-colors hover:text-foreground">Stack</a></li>
+            <li><a href="#projetos" class="text-sm text-muted transition-colors hover:text-foreground">Projetos</a></li>
+            <li><a href="#processo" class="text-sm text-muted transition-colors hover:text-foreground">Processo</a></li>
+            <li><a href="#servicos" class="text-sm text-muted transition-colors hover:text-foreground">Serviços</a></li>
+            <li><a href="#contato" class="text-sm text-muted transition-colors hover:text-foreground">Contato</a></li>
+          </ul>
+        </nav>
+
+        <!-- Botão do menu mobile (hamburger) — visível apenas abaixo de md -->
+        <button
+          type="button"
+          data-menu-toggle
+          aria-expanded="false"
+          aria-controls="menu-mobile"
+          aria-label="Abrir menu"
+          class="-mr-2 flex h-10 w-10 items-center justify-center rounded-md text-muted transition-colors hover:text-foreground md:hidden"
+        >
+          <i data-lucide="menu" class="menu-icon-open h-5 w-5"></i>
+          <i data-lucide="x" class="menu-icon-close hidden h-5 w-5"></i>
+        </button>
+      </div>
+
+      <!-- Menu mobile (painel que abre/fecha abaixo da barra) -->
+      <nav
+        id="menu-mobile"
+        data-menu
+        aria-label="Navegação principal"
+        class="hidden border-t border-border md:hidden"
+      >
+        <ul class="container-main flex flex-col gap-1 py-4">
+          <li><a href="#sobre" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Sobre</a></li>
+          <li><a href="#tecnologias" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Stack</a></li>
+          <li><a href="#projetos" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Projetos</a></li>
+          <li><a href="#processo" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Processo</a></li>
+          <li><a href="#servicos" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Serviços</a></li>
+          <li><a href="#contato" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Contato</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- ======================= CONTEÚDO PRINCIPAL ======================= -->
+    <main id="conteudo">
+      <!-- 1. Hero -->
+      <section id="hero" aria-labelledby="titulo-hero">
+        <h1 id="titulo-hero">JMATTOS.DEV</h1>
+        <p>Software, Technology & Solutions</p>
+        <p>[BREVE APRESENTAÇÃO PROFISSIONAL — placeholder]</p>
+      </section>
+
+      <!-- 2. Sobre mim -->
+      <section id="sobre" aria-labelledby="titulo-sobre">
+        <h2 id="titulo-sobre">Sobre mim</h2>
+        <p>[SUA TRAJETÓRIA, FORMAÇÃO E MOTIVAÇÃO — placeholder]</p>
+      </section>
+
+      <!-- 3. Tecnologias -->
+      <section id="tecnologias" aria-labelledby="titulo-tecnologias">
+        <h2 id="titulo-tecnologias">Tecnologias</h2>
+        <p>[TECNOLOGIAS QUE VOCÊ USA OU ESTUDA — placeholder]</p>
+        <ul>
+          <li>[TECNOLOGIA 1]</li>
+          <li>[TECNOLOGIA 2]</li>
+          <li>[TECNOLOGIA 3]</li>
+        </ul>
+      </section>
+
+      <!-- 4. Projetos -->
+      <section id="projetos" aria-labelledby="titulo-projetos">
+        <h2 id="titulo-projetos">Projetos</h2>
+        <p>[POUCOS PROJETOS, BEM APRESENTADOS — placeholder]</p>
+
+        <!-- Cada projeto é um conteúdo autocontido (article) -->
+        <article>
+          <h3>[NOME DO PROJETO 1]</h3>
+          <p>[DESCRIÇÃO DO PROJETO 1 — placeholder]</p>
+          <p>
+            <a href="[LINK DO REPOSITÓRIO 1]">Ver no GitHub</a>
+            <a href="[LINK DO PROJETO 1]">Ver projeto</a>
+          </p>
+        </article>
+
+        <article>
+          <h3>[NOME DO PROJETO 2]</h3>
+          <p>[DESCRIÇÃO DO PROJETO 2 — placeholder]</p>
+          <p>
+            <a href="[LINK DO REPOSITÓRIO 2]">Ver no GitHub</a>
+            <a href="[LINK DO PROJETO 2]">Ver projeto</a>
+          </p>
+        </article>
+      </section>
+
+      <!-- 5. Processo de trabalho -->
+      <section id="processo" aria-labelledby="titulo-processo">
+        <h2 id="titulo-processo">Processo de trabalho</h2>
+        <ol>
+          <li>[ETAPA 1 DO PROCESSO — placeholder]</li>
+          <li>[ETAPA 2 DO PROCESSO — placeholder]</li>
+          <li>[ETAPA 3 DO PROCESSO — placeholder]</li>
+        </ol>
+      </section>
+
+      <!-- 6. Serviços -->
+      <section id="servicos" aria-labelledby="titulo-servicos">
+        <h2 id="titulo-servicos">Serviços</h2>
+        <ul>
+          <li>[SERVIÇO 1 — placeholder]</li>
+          <li>[SERVIÇO 2 — placeholder]</li>
+          <li>[SERVIÇO 3 — placeholder]</li>
+        </ul>
+      </section>
+
+      <!-- 7. GitHub / presença profissional -->
+      <section id="github" aria-labelledby="titulo-github">
+        <h2 id="titulo-github">GitHub & presença profissional</h2>
+        <p>[DESCRIÇÃO DA SUA PRESENÇA PROFISSIONAL — placeholder]</p>
+        <p>
+          <a href="[SEU USUÁRIO DO GITHUB]">GitHub</a>
+          <a href="[SEU LINKEDIN]">LinkedIn</a>
+        </p>
+      </section>
+
+      <!-- 8. Contato -->
+      <section id="contato" aria-labelledby="titulo-contato">
+        <h2 id="titulo-contato">Contato</h2>
+        <p>[MENSAGEM DE CONVITE AO CONTATO — placeholder]</p>
+        <a href="mailto:[SEU-EMAIL@EXEMPLO.com]">[SEU-EMAIL@EXEMPLO.com]</a>
+      </section>
+    </main>
+
+    <!-- =====================================================================
+         DEMONSTRAÇÃO TEMPORÁRIA DO DESIGN SYSTEM
+         Este bloco NÃO é uma seção do site. Ele apenas exibe os tokens em uso
+         para você visualizar o design system no navegador.
+         Será removido quando as seções reais forem construídas.
+         ===================================================================== -->
+    <section class="container-main py-section" aria-label="Demonstração do design system">
+      <header class="mb-12">
+        <p class="font-mono text-xs uppercase tracking-widest text-accent">Design system</p>
+        <h2 class="mt-2 text-3xl">Tokens em uso</h2>
+        <p class="mt-3 max-w-xl text-muted">
+          Exemplos temporários de como cores, tipografia, bordas, raios e sombras serão aplicados nas seções.
+        </p>
+      </header>
+
+      <!-- Cores -->
+      <h3 class="mb-4 text-xl">Cores</h3>
+      <ul class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <li class="rounded-xl border border-border bg-background p-4">background</li>
+        <li class="rounded-xl border border-border bg-surface p-4">surface</li>
+        <li class="rounded-xl border border-border bg-surface-2 p-4">surface-2</li>
+        <li class="rounded-xl border border-border bg-primary p-4">primary</li>
+        <li class="rounded-xl border border-border bg-primary-light p-4">primary-light</li>
+        <li class="rounded-xl border border-border bg-accent p-4 text-background">accent</li>
+        <li class="rounded-xl border border-border bg-foreground p-4 text-background">foreground</li>
+        <li class="rounded-xl border border-border bg-muted p-4">muted</li>
+      </ul>
+
+      <!-- Tipografia -->
+      <h3 class="mb-4 mt-12 text-xl">Tipografia</h3>
+      <div class="rounded-xl border border-border bg-surface p-6">
+        <h1 class="text-4xl">Título — Space Grotesk</h1>
+        <h2 class="mt-2 text-2xl">Subtítulo h2</h2>
+        <h3 class="mt-2 text-xl">Subtítulo h3</h3>
+        <p class="mt-4 text-muted">
+          Corpo de texto — Inter. Este parágrafo demonstra o texto em body, na cor muted.
+        </p>
+        <p class="mt-2 font-mono text-sm text-primary-light">
+          const token = "JetBrains Mono"; // elementos técnicos
+        </p>
+      </div>
+
+      <!-- Card, botões e micro-acento -->
+      <h3 class="mb-4 mt-12 text-xl">Card, botões e micro-acento</h3>
+      <div class="grid gap-6 md:grid-cols-2">
+        <article class="rounded-xl border border-border bg-surface p-6 shadow-card">
+          <p class="font-mono text-xs text-accent">01 — Projeto</p>
+          <h3 class="mt-2 text-lg">Título do card</h3>
+          <p class="mt-2 text-sm text-muted">Card com borda, radius e sombra discretos.</p>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button type="button" class="rounded-md bg-primary px-4 py-2 text-sm text-foreground transition hover:bg-primary/90">
+              Primário
+            </button>
+            <button type="button" class="rounded-md border border-border px-4 py-2 text-sm text-foreground transition hover:bg-surface-2">
+              Secundário
+            </button>
+          </div>
+        </article>
+
+        <div class="rounded-xl border border-border bg-surface p-6 shadow-glow">
+          <p class="font-mono text-xs text-accent">02 — Destaque</p>
+          <h3 class="mt-2 text-lg">Glow discreto</h3>
+          <p class="mt-2 text-sm text-muted">Exemplo do glow azul muito sutil ao redor do card.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= RODAPÉ ======================= -->
+    <footer>
+      <p>© 2026 JMATTOS.DEV — [SEU NOME]</p>
+    </footer>
 
     <script type="module" src="/src/js/main.js"></script>
   </body>

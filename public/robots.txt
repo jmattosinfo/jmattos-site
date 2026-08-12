@@ -1,0 +1,10 @@
+# robots.txt — JMATTOS.DEV
+# Permite que todos os rastreadores (Google, Bing etc.) indexem o site.
+#
+# IMPORTANTE: a linha "Sitemap" usa um domínio placeholder.
+# Troque https://SEU-DOMINIO.com pelo domínio real ao publicar.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://SEU-DOMINIO.com/sitemap.xml

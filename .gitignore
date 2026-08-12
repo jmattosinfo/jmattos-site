@@ -1,19 +1,59 @@
-# Logs
-logs
+# ============================================================
+# DEPENDÊNCIAS
+# ============================================================
+node_modules/
+
+# ============================================================
+# BUILD DE PRODUÇÃO
+# ============================================================
+dist/
+dist-ssr/
+*.local
+
+# ============================================================
+# LOGS
+# ============================================================
+logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Dependências instaladas
-node_modules
+# ============================================================
+# VARIÁVEIS DE AMBIENTE / SEGREDOS
+# ============================================================
+.env
+.env.*
+!.env.example
 
-# Build de produção
-dist
-dist-ssr
+# ============================================================
+# CACHE DE FERRAMENTAS / TESTES
+# ============================================================
+.vite/
+.cache/
+coverage/
+*.tsbuildinfo
+.eslintcache
 
-# Arquivos locais
-*.local
+# ============================================================
+# SISTEMAS OPERACIONAIS
+# ============================================================
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
 
-# Editor (mantém apenas arquivos de workspace compartilháveis)
+# ============================================================
+# EDITORES / IDEs (mantém apenas arquivos de workspace
+# compartilháveis, ex.: recomendações de extensões)
+# ============================================================
 .vscode/*
 !.vscode/extensions.json
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

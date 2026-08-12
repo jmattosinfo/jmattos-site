@@ -5,12 +5,35 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- SEO básico (será expandido nas próximas etapas) -->
+    <!-- SEO: título único + descrição (resumo em buscas e compartilhamentos) -->
     <title>JMATTOS.DEV — Software, Technology & Solutions</title>
     <meta
       name="description"
       content="Portfólio profissional de JMATTOS.DEV — desenvolvimento de software, tecnologia e soluções."
     />
+
+    <!-- Canonical: aponta a URL canônica (evita conteúdo duplicado entre
+         www/não-www, barra final, parâmetros etc.).
+         TROQUE o domínio placeholder pelo domínio real ao publicar. -->
+    <link rel="canonical" href="https://SEU-DOMINIO.com/" />
+
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp etc.): controla o preview ao
+         compartilhar. og:image ainda NÃO existe — crie uma imagem 1200×630 em
+         /public e adicione <meta property="og:image" content="https://SEU-DOMINIO.com/og-image.png" />
+         quando o arquivo estiver pronto. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JMATTOS.DEV" />
+    <meta property="og:title" content="JMATTOS.DEV — Software, Technology & Solutions" />
+    <meta
+      property="og:description"
+      content="Portfólio profissional de JMATTOS.DEV — desenvolvimento de software, tecnologia e soluções."
+    />
+    <meta property="og:url" content="https://SEU-DOMINIO.com/" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter/X Card: o X lê o Open Graph quando twitter:* não é declarado;
+         aqui só definimos o tipo (summary usa título + descrição). -->
+    <meta name="twitter:card" content="summary" />
 
     <!-- Fontes: Space Grotesk (títulos), Inter (textos), JetBrains Mono (código) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -72,13 +95,14 @@
         aria-label="Navegação principal"
         class="hidden border-t border-border md:hidden"
       >
-        <ul class="container-main flex flex-col gap-1 py-4">
-          <li><a href="#sobre" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Sobre</a></li>
-          <li><a href="#tecnologias" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Stack</a></li>
-          <li><a href="#projetos" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Projetos</a></li>
-          <li><a href="#processo" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Processo</a></li>
-          <li><a href="#servicos" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Serviços</a></li>
-          <li><a href="#contato" class="block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Contato</a></li>
+        <!-- py-3 nos links: alvo de toque maior (~44px) no menu mobile -->
+        <ul class="container-main flex flex-col gap-1 py-3">
+          <li><a href="#sobre" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Sobre</a></li>
+          <li><a href="#tecnologias" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Stack</a></li>
+          <li><a href="#projetos" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Projetos</a></li>
+          <li><a href="#processo" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Processo</a></li>
+          <li><a href="#servicos" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Serviços</a></li>
+          <li><a href="#contato" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Contato</a></li>
         </ul>
       </nav>
     </header>
@@ -164,18 +188,33 @@
 
       <!-- 2. Sobre mim -->
       <section id="sobre" aria-labelledby="titulo-sobre" class="container-main py-section">
-        <header class="max-w-2xl">
+        <header class="max-w-2xl" data-reveal>
           <p class="font-mono text-xs uppercase tracking-widest text-accent">01 — Sobre</p>
           <h2 id="titulo-sobre" class="mt-3 text-3xl tracking-tight sm:text-4xl">Sobre mim</h2>
         </header>
 
-        <div class="mt-8 max-w-3xl space-y-4 text-muted">
-          <p>
-            [BREVE TEXTO SOBRE SUA TRAJETÓRIA — placeholder. Ex.: sua relação com a tecnologia e o que te levou ao desenvolvimento.]
-          </p>
-          <p>
-            [O QUE VOCÊ BUSCA — placeholder. Ex.: área de interesse, tipo de projetos, aprendizado contínuo.]
-          </p>
+        <div class="mt-8 grid items-center gap-10 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
+          <!-- Texto -->
+          <div class="max-w-3xl space-y-4 text-muted">
+            <p>
+              [BREVE TEXTO SOBRE SUA TRAJETÓRIA — placeholder. Ex.: sua relação com a tecnologia e o que te levou ao desenvolvimento.]
+            </p>
+            <p>
+              [O QUE VOCÊ BUSCA — placeholder. Ex.: área de interesse, tipo de projetos, aprendizado contínuo.]
+            </p>
+          </div>
+
+          <!-- Foto: imagem dentro de um "anel" arredondado com gradiente azul suave -->
+          <div class="mx-auto w-64 max-w-full sm:w-80 lg:w-full lg:max-w-sm">
+            <div class="rounded-[2rem] bg-linear-to-br from-primary via-primary/20 to-primary-light/60 p-1.5 shadow-glow">
+              <img
+                src="/jmattos.jpg"
+                alt="Julio Mattos — foto de perfil"
+                class="aspect-[4/5] w-full rounded-[1.55rem] object-cover"
+                loading="lazy"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -185,7 +224,7 @@
            bg-primary = experiência · bg-primary-light = estudo · bg-accent = interesse
            E atualize o atributo title com o nível real. -->
       <section id="tecnologias" aria-labelledby="titulo-tecnologias" class="container-main py-section">
-        <header class="max-w-2xl">
+        <header class="max-w-2xl" data-reveal>
           <p class="font-mono text-xs uppercase tracking-widest text-accent">02 — Stack</p>
           <h2 id="titulo-tecnologias" class="mt-3 text-3xl tracking-tight sm:text-4xl">Stack</h2>
           <p class="mt-4 text-muted">
@@ -195,7 +234,9 @@
 
         <div class="mt-12 grid gap-6 md:grid-cols-3">
           <!-- Backend -->
-          <article class="rounded-xl border border-border bg-surface p-6">
+          <article
+            class="rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
+          >
             <div class="flex items-center gap-3">
               <i data-lucide="server" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
               <h3 class="text-lg">Backend</h3>
@@ -225,7 +266,9 @@
           </article>
 
           <!-- Frontend -->
-          <article class="rounded-xl border border-border bg-surface p-6">
+          <article
+            class="rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
+          >
             <div class="flex items-center gap-3">
               <i data-lucide="code-2" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
               <h3 class="text-lg">Frontend</h3>
@@ -255,7 +298,9 @@
           </article>
 
           <!-- Tools -->
-          <article class="rounded-xl border border-border bg-surface p-6">
+          <article
+            class="rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
+          >
             <div class="flex items-center gap-3">
               <i data-lucide="wrench" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
               <h3 class="text-lg">Tools</h3>
@@ -294,139 +339,262 @@
         </div>
       </section>
 
-      <!-- 4. Projetos -->
-      <section id="projetos" aria-labelledby="titulo-projetos">
-        <h2 id="titulo-projetos">Projetos</h2>
-        <p>[POUCOS PROJETOS, BEM APRESENTADOS — placeholder]</p>
-
-        <!-- Cada projeto é um conteúdo autocontido (article) -->
-        <article>
-          <h3>[NOME DO PROJETO 1]</h3>
-          <p>[DESCRIÇÃO DO PROJETO 1 — placeholder]</p>
-          <p>
-            <a href="[LINK DO REPOSITÓRIO 1]">Ver no GitHub</a>
-            <a href="[LINK DO PROJETO 1]">Ver projeto</a>
+      <!-- 4. Projetos
+           Os cards são GERADOS dinamicamente por src/js/projects.js
+           a partir dos dados em src/js/data/projects.js.
+           Este HTML contém apenas o cabeçalho da seção e um container
+           vazio — NENHUMA informação de projeto fica aqui. -->
+      <section id="projetos" aria-labelledby="titulo-projetos" class="container-main py-section">
+        <header class="max-w-2xl" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">03 — Projetos</p>
+          <h2 id="titulo-projetos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Projetos</h2>
+          <p class="mt-4 text-muted">
+            [POUCOS PROJETOS, BEM APRESENTADOS — placeholder. Cada projeto é tratado como um estudo de caso: contexto, problema e resultado.]
           </p>
-        </article>
+        </header>
 
-        <article>
-          <h3>[NOME DO PROJETO 2]</h3>
-          <p>[DESCRIÇÃO DO PROJETO 2 — placeholder]</p>
-          <p>
-            <a href="[LINK DO REPOSITÓRIO 2]">Ver no GitHub</a>
-            <a href="[LINK DO PROJETO 2]">Ver projeto</a>
-          </p>
-        </article>
+        <!-- Container preenchido pela função renderizarProjetos() -->
+        <div data-projetos class="mx-auto mt-12 max-w-4xl space-y-10"></div>
       </section>
 
-      <!-- 5. Processo de trabalho -->
-      <section id="processo" aria-labelledby="titulo-processo">
-        <h2 id="titulo-processo">Processo de trabalho</h2>
-        <ol>
-          <li>[ETAPA 1 DO PROCESSO — placeholder]</li>
-          <li>[ETAPA 2 DO PROCESSO — placeholder]</li>
-          <li>[ETAPA 3 DO PROCESSO — placeholder]</li>
+      <!-- 5. Processo de trabalho
+           Sequência visual 01 → 04: linhas finas + números pequenos.
+           O amarelo aparece APENAS nos números e nas linhas de conexão
+           (micro-acento, extremamente discreto).
+           No desktop as linhas conectam os números; no mobile cada passo
+           empilha com a sua própria linha. -->
+      <section id="processo" aria-labelledby="titulo-processo" class="container-main py-section">
+        <header class="max-w-2xl" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">04 — Processo</p>
+          <h2 id="titulo-processo" class="mt-3 text-3xl tracking-tight sm:text-4xl">Como trabalho</h2>
+          <p class="mt-4 text-muted">
+            [BREVE DESCRIÇÃO DO PROCESSO — placeholder. Ex.: uma sequência clara e
+            previsível — cada etapa conecta a anterior e comunica método e transparência.]
+          </p>
+        </header>
+
+        <ol class="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <!-- 01 — Entender -->
+          <li class="flex flex-col" data-reveal>
+            <!-- Linha de conexão: número amarelo + linha fina que avança
+                 até o próximo número (apenas em lg, via -mr-6) -->
+            <div aria-hidden="true" class="flex items-center gap-4">
+              <span class="font-mono text-base font-medium leading-none tracking-tight text-accent">01</span>
+              <span class="h-px flex-1 bg-gradient-to-r from-accent/25 to-accent/10 lg:-mr-6"></span>
+            </div>
+            <h3 class="mt-5 text-lg">Entender</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              [O QUE ACONTECE NA ETAPA "ENTENDER" — placeholder. Ex.: levantamento do contexto, necessidades e objetivos.]
+            </p>
+          </li>
+
+          <!-- 02 — Planejar -->
+          <li class="flex flex-col" data-reveal style="--reveal-delay: 70ms">
+            <div aria-hidden="true" class="flex items-center gap-4">
+              <span class="font-mono text-base font-medium leading-none tracking-tight text-accent">02</span>
+              <span class="h-px flex-1 bg-gradient-to-r from-accent/25 to-accent/10 lg:-mr-6"></span>
+            </div>
+            <h3 class="mt-5 text-lg">Planejar</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              [O QUE ACONTECE NA ETAPA "PLANEJAR" — placeholder. Ex.: escopo, arquitetura e etapas de entrega.]
+            </p>
+          </li>
+
+          <!-- 03 — Desenvolver -->
+          <li class="flex flex-col" data-reveal style="--reveal-delay: 140ms">
+            <div aria-hidden="true" class="flex items-center gap-4">
+              <span class="font-mono text-base font-medium leading-none tracking-tight text-accent">03</span>
+              <span class="h-px flex-1 bg-gradient-to-r from-accent/25 to-accent/10 lg:-mr-6"></span>
+            </div>
+            <h3 class="mt-5 text-lg">Desenvolver</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              [O QUE ACONTECE NA ETAPA "DESENVOLVER" — placeholder. Ex.: construção, testes e revisões.]
+            </p>
+          </li>
+
+          <!-- 04 — Entregar -->
+          <li class="flex flex-col" data-reveal style="--reveal-delay: 210ms">
+            <div aria-hidden="true" class="flex items-center gap-4">
+              <span class="font-mono text-base font-medium leading-none tracking-tight text-accent">04</span>
+              <!-- Sem linha à direita: é o fim da sequência -->
+              <span class="h-px flex-1 bg-gradient-to-r from-accent/25 to-accent/10 lg:hidden"></span>
+            </div>
+            <h3 class="mt-5 text-lg">Entregar</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              [O QUE ACONTECE NA ETAPA "ENTREGAR" — placeholder. Ex.: publicação, documentação e acompanhamento.]
+            </p>
+          </li>
         </ol>
       </section>
 
-      <!-- 6. Serviços -->
-      <section id="servicos" aria-labelledby="titulo-servicos">
-        <h2 id="titulo-servicos">Serviços</h2>
-        <ul>
-          <li>[SERVIÇO 1 — placeholder]</li>
-          <li>[SERVIÇO 2 — placeholder]</li>
-          <li>[SERVIÇO 3 — placeholder]</li>
-        </ul>
+      <!-- 6. Serviços
+           Os cards são GERADOS dinamicamente por src/js/servicos.js
+           a partir dos dados em src/js/data/servicos.js.
+           Este HTML contém apenas o cabeçalho da seção e um container
+           vazio — NENHUM serviço fica aqui.
+           Enquanto nenhum serviço for confirmado, o script exibe cards
+           placeholder "a confirmar" (nada é inventado). -->
+      <section id="servicos" aria-labelledby="titulo-servicos" class="container-main py-section">
+        <header class="max-w-2xl" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">05 — Serviços</p>
+          <h2 id="titulo-servicos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Serviços</h2>
+          <p class="mt-4 text-muted">
+            [DESCRIÇÃO CURTA DOS SERVIÇOS — placeholder. Ex.: como posso ajudar
+            com tecnologia, projetos e suporte.]
+          </p>
+        </header>
+
+        <!-- Container preenchido pela função renderizarServicos() -->
+        <div data-servicos></div>
       </section>
 
-      <!-- 7. GitHub / presença profissional -->
-      <section id="github" aria-labelledby="titulo-github">
-        <h2 id="titulo-github">GitHub & presença profissional</h2>
-        <p>[DESCRIÇÃO DA SUA PRESENÇA PROFISSIONAL — placeholder]</p>
-        <p>
-          <a href="[SEU USUÁRIO DO GITHUB]">GitHub</a>
-          <a href="[SEU LINKEDIN]">LinkedIn</a>
-        </p>
+      <!-- 7. Presença profissional
+           Canais do JMATTOS.DEV (GitHub, LinkedIn, Instagram, E-mail,
+           WhatsApp). Os cards são GERADOS dinamicamente por
+           src/js/presenca.js a partir dos dados em src/js/data/presenca.js.
+           Este HTML contém apenas o cabeçalho e um container vazio.
+           Enquanto os links não forem fornecidos, cada card exibe
+           "[Link pendente]" — nenhuma URL é inventada.
+           Links externos usam target="_blank" rel="noopener noreferrer"
+           (ver presenca.js). -->
+      <section id="presenca" aria-labelledby="titulo-presenca" class="container-main py-section">
+        <header class="max-w-2xl" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">06 — Presença</p>
+          <h2 id="titulo-presenca" class="mt-3 text-3xl tracking-tight sm:text-4xl">Presença profissional</h2>
+          <p class="mt-4 text-muted">
+            [DESCRIÇÃO DA SUA PRESENÇA PROFISSIONAL — placeholder. Ex.: canais onde
+            você compartilha projetos, mantém contato e acompanha o mercado.]
+          </p>
+        </header>
+
+        <!-- Container preenchido pela função renderizarPresenca() -->
+        <div data-presenca></div>
       </section>
 
-      <!-- 8. Contato -->
-      <section id="contato" aria-labelledby="titulo-contato">
-        <h2 id="titulo-contato">Contato</h2>
-        <p>[MENSAGEM DE CONVITE AO CONTATO — placeholder]</p>
-        <a href="mailto:[SEU-EMAIL@EXEMPLO.com]">[SEU-EMAIL@EXEMPLO.com]</a>
+      <!-- 8. Contato
+           CTA + formulário SEM backend (v1).
+           O formulário NÃO finge envio: ao submeter, abre o aplicativo
+           de e-mail do visitante com a mensagem pronta (mailto),
+           montado por src/js/contato.js. Nenhum dado vai a servidor.
+           O e-mail de destino fica em src/js/data/contato.js.
+           Acessibilidade: labels associados, autocomplete, validação
+           nativa (required/type=email) e status anunciado via role="status". -->
+      <section id="contato" aria-labelledby="titulo-contato" class="container-main py-section">
+        <header class="max-w-2xl" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">07 — Contato</p>
+          <h2 id="titulo-contato" class="mt-3 text-3xl tracking-tight sm:text-4xl">Tem um projeto em mente?</h2>
+          <p class="mt-4 text-muted">
+            Vamos conversar. [MENSAGEM DE CONVITE AO CONTATO — placeholder. Ex.: conte
+            sobre sua ideia, objetivo e prazo — respondo o quanto antes.]
+          </p>
+          <a
+            href="#formulario-contato"
+            class="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
+          >
+            Vamos conversar
+            <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+          </a>
+        </header>
+
+        <div class="mt-14 grid gap-8 lg:grid-cols-[1fr_1.15fr] lg:items-start">
+          <!-- Opção direta: e-mail (texto/href preenchidos por contato.js) -->
+          <aside
+            aria-labelledby="titulo-contato-direto"
+            class="rounded-xl border border-border bg-surface p-6 lg:sticky lg:top-24"
+          >
+            <h3 id="titulo-contato-direto" class="text-lg">Prefere escrever direto?</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              [Nota — placeholder. Ex.: se preferir, envie um e-mail direto — sem
+              formulário.]
+            </p>
+            <a
+              data-contato-email
+              href="#"
+              class="mt-6 inline-flex max-w-full items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              aria-label="Enviar e-mail"
+            >
+              <i data-lucide="mail" class="h-4 w-4 shrink-0 text-primary-light" aria-hidden="true"></i>
+              <span data-contato-email-text class="min-w-0 truncate">[SEU-EMAIL@EXEMPLO.com]</span>
+            </a>
+          </aside>
+
+          <!-- Formulário: monta mailto (sem backend, sem fingir envio) -->
+          <form
+            data-contato-form
+            id="formulario-contato"
+            class="rounded-xl border border-border bg-surface p-6 sm:p-8"
+            aria-describedby="nota-formulario-contato"
+          >
+            <h3 class="text-lg">Ou preencha o formulário</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">
+              [Nota — placeholder. Ex.: preencha os campos abaixo e a mensagem será
+              montada no seu aplicativo de e-mail (mailto).]
+            </p>
+
+            <div class="mt-7 grid gap-5 sm:grid-cols-2">
+              <div class="flex flex-col gap-1.5">
+                <label for="contato-nome" class="text-sm font-medium">Nome</label>
+                <input
+                  id="contato-nome"
+                  name="nome"
+                  type="text"
+                  required
+                  autocomplete="name"
+                  placeholder="Seu nome"
+                  class="rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
+                />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="contato-email" class="text-sm font-medium">Seu e-mail</label>
+                <input
+                  id="contato-email"
+                  name="email"
+                  type="email"
+                  required
+                  autocomplete="email"
+                  placeholder="voce@exemplo.com"
+                  class="rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
+                />
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-1.5">
+              <label for="contato-mensagem" class="text-sm font-medium">Mensagem</label>
+              <textarea
+                id="contato-mensagem"
+                name="mensagem"
+                rows="5"
+                required
+                placeholder="Conte sobre o seu projeto..."
+                class="resize-y rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
+              ></textarea>
+            </div>
+
+            <div class="mt-7 flex flex-wrap items-center gap-4">
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
+              >
+                Preparar mensagem
+                <i data-lucide="mail" class="h-4 w-4" aria-hidden="true"></i>
+              </button>
+              <p id="nota-formulario-contato" class="max-w-xs text-xs leading-relaxed text-muted">
+                [Nota — placeholder. Ex.: ao enviar, seu aplicativo de e-mail abre
+                com a mensagem pronta. Esta versão não envia dados por servidor.]
+              </p>
+            </div>
+
+            <!-- Status (anunciado a leitores de tela via role="status").
+                 Só aparece quando o e-mail de destino ainda não foi configurado. -->
+            <p data-contato-status role="status" hidden class="mt-4 rounded-md border border-accent/30 bg-accent/10 px-3 py-2 text-xs text-foreground"></p>
+          </form>
+        </div>
       </section>
     </main>
 
-    <!-- =====================================================================
-         DEMONSTRAÇÃO TEMPORÁRIA DO DESIGN SYSTEM
-         Este bloco NÃO é uma seção do site. Ele apenas exibe os tokens em uso
-         para você visualizar o design system no navegador.
-         Será removido quando as seções reais forem construídas.
-         ===================================================================== -->
-    <section class="container-main py-section" aria-label="Demonstração do design system">
-      <header class="mb-12">
-        <p class="font-mono text-xs uppercase tracking-widest text-accent">Design system</p>
-        <h2 class="mt-2 text-3xl">Tokens em uso</h2>
-        <p class="mt-3 max-w-xl text-muted">
-          Exemplos temporários de como cores, tipografia, bordas, raios e sombras serão aplicados nas seções.
-        </p>
-      </header>
-
-      <!-- Cores -->
-      <h3 class="mb-4 text-xl">Cores</h3>
-      <ul class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <li class="rounded-xl border border-border bg-background p-4">background</li>
-        <li class="rounded-xl border border-border bg-surface p-4">surface</li>
-        <li class="rounded-xl border border-border bg-surface-2 p-4">surface-2</li>
-        <li class="rounded-xl border border-border bg-primary p-4">primary</li>
-        <li class="rounded-xl border border-border bg-primary-light p-4">primary-light</li>
-        <li class="rounded-xl border border-border bg-accent p-4 text-background">accent</li>
-        <li class="rounded-xl border border-border bg-foreground p-4 text-background">foreground</li>
-        <li class="rounded-xl border border-border bg-muted p-4">muted</li>
-      </ul>
-
-      <!-- Tipografia -->
-      <h3 class="mb-4 mt-12 text-xl">Tipografia</h3>
-      <div class="rounded-xl border border-border bg-surface p-6">
-        <h1 class="text-4xl">Título — Space Grotesk</h1>
-        <h2 class="mt-2 text-2xl">Subtítulo h2</h2>
-        <h3 class="mt-2 text-xl">Subtítulo h3</h3>
-        <p class="mt-4 text-muted">
-          Corpo de texto — Inter. Este parágrafo demonstra o texto em body, na cor muted.
-        </p>
-        <p class="mt-2 font-mono text-sm text-primary-light">
-          const token = "JetBrains Mono"; // elementos técnicos
-        </p>
-      </div>
-
-      <!-- Card, botões e micro-acento -->
-      <h3 class="mb-4 mt-12 text-xl">Card, botões e micro-acento</h3>
-      <div class="grid gap-6 md:grid-cols-2">
-        <article class="rounded-xl border border-border bg-surface p-6 shadow-card">
-          <p class="font-mono text-xs text-accent">01 — Projeto</p>
-          <h3 class="mt-2 text-lg">Título do card</h3>
-          <p class="mt-2 text-sm text-muted">Card com borda, radius e sombra discretos.</p>
-          <div class="mt-4 flex flex-wrap gap-3">
-            <button type="button" class="rounded-md bg-primary px-4 py-2 text-sm text-foreground transition hover:bg-primary/90">
-              Primário
-            </button>
-            <button type="button" class="rounded-md border border-border px-4 py-2 text-sm text-foreground transition hover:bg-surface-2">
-              Secundário
-            </button>
-          </div>
-        </article>
-
-        <div class="rounded-xl border border-border bg-surface p-6 shadow-glow">
-          <p class="font-mono text-xs text-accent">02 — Destaque</p>
-          <h3 class="mt-2 text-lg">Glow discreto</h3>
-          <p class="mt-2 text-sm text-muted">Exemplo do glow azul muito sutil ao redor do card.</p>
-        </div>
-      </div>
-    </section>
-
     <!-- ======================= RODAPÉ ======================= -->
-    <footer>
-      <p>© 2026 JMATTOS.DEV — [SEU NOME]</p>
+    <footer class="container-main border-t border-border py-8">
+      <p class="text-sm text-muted">© 2026 JMATTOS.DEV — [SEU NOME]</p>
     </footer>
 
     <script type="module" src="/src/js/main.js"></script>

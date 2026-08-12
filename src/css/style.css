@@ -139,7 +139,49 @@
 }
 
 /* ============================================================
-   4) EXEMPLOS DE USO (classes geradas pelos tokens)
+   4) MICROINTERAÇÕES — REVEAL ON SCROLL
+   ------------------------------------------------------------
+   Discreto: fade + leve translateY (14px). Aplica-se APENAS a
+   elementos com [data-reveal] e APENAS quando o usuário NÃO pediu
+   redução de movimento. O JS (src/js/reveal.js) adiciona
+   .is-revealed quando o elemento entra na viewport.
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.55s ease-out,
+      transform 0.55s ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Respeita prefers-reduced-motion: colapsa qualquer transição/
+   animação e garante que o conteúdo revelado fique SEMPRE visível. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   5) EXEMPLOS DE USO (classes geradas pelos tokens)
    ------------------------------------------------------------
    <section class="container-main py-section">              → container + espaço
    <div class="rounded-xl border border-border bg-surface p-6 shadow-card">

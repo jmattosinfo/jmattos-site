@@ -1,0 +1,19 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependências instaladas
+node_modules
+
+# Build de produção
+dist
+dist-ssr
+
+# Arquivos locais
+*.local
+.DS_Store
+
+# Editor (mantém apenas arquivos de workspace compartilháveis)
+.vscode/*
+!.vscode/extensions.json

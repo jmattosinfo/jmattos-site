@@ -1,0 +1,49 @@
+/* ============================================================
+   TEMA GLOBAL — Tailwind CSS v4 (configuração "CSS-first")
+   ============================================================ */
+
+/* Importa o Tailwind (compilado pelo plugin @tailwindcss/vite) */
+@import "tailwindcss";
+
+/* ============================================================
+   @theme: aqui definimos as cores e fontes do projeto.
+   Cada --color-* vira um utilitário Tailwind (ex.: bg-background,
+   text-muted, border-primary) e cada --font-* vira um utilitário
+   de fonte (font-sans, font-display, font-mono).
+   ============================================================ */
+@theme {
+  /* Paleta — tema dark */
+  --color-background: #05070d;
+  --color-surface: #0a1020;
+  --color-surface-2: #101a30;
+
+  --color-primary: #2563eb;
+  --color-primary-light: #38bdf8;
+
+  /* Amarelo = micro-acento (assinatura visual) */
+  --color-accent: #eab308;
+
+  --color-foreground: #f8fafc;
+  --color-muted: #94a3b8;
+
+  /* Tipografia */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+/* ============================================================
+   @layer base: estilos padrão da página inteira.
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}

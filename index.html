@@ -86,10 +86,80 @@
     <!-- ======================= CONTEÚDO PRINCIPAL ======================= -->
     <main id="conteudo">
       <!-- 1. Hero -->
-      <section id="hero" aria-labelledby="titulo-hero">
-        <h1 id="titulo-hero">JMATTOS.DEV</h1>
-        <p>Software, Technology & Solutions</p>
-        <p>[BREVE APRESENTAÇÃO PROFISSIONAL — placeholder]</p>
+      <section
+        id="hero"
+        aria-labelledby="titulo-hero"
+        class="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden"
+      >
+        <!-- Fundo decorativo (grid + glow) — aria-hidden porque é apenas visual -->
+        <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-grid"></div>
+        <div
+          aria-hidden="true"
+          class="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+        ></div>
+
+        <div class="container-main relative grid items-center gap-12 py-20 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:py-0">
+          <!-- Texto -->
+          <div>
+            <p class="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-muted">
+              <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+              JMATTOS.DEV
+            </p>
+
+            <h1 id="titulo-hero" class="mt-5 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              Julio Mattos
+            </h1>
+
+            <p class="mt-4 font-display text-lg text-primary-light sm:text-xl">
+              Software, Technology & Solutions
+            </p>
+
+            <p class="mt-5 max-w-xl text-muted">
+              Desenvolvimento de software, tecnologia e soluções digitais — com simplicidade, performance e atenção aos detalhes.
+            </p>
+
+            <div class="mt-9 flex flex-wrap items-center gap-4">
+              <a
+                href="#projetos"
+                class="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
+              >
+                Ver projetos
+                <i data-lucide="arrow-right" class="h-4 w-4"></i>
+              </a>
+              <a
+                href="#contato"
+                class="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              >
+                <i data-lucide="mail" class="h-4 w-4"></i>
+                Entrar em contato
+              </a>
+            </div>
+          </div>
+
+          <!-- Terminal: representação tecnológica discreta (decorativa) -->
+          <div aria-hidden="true" class="relative mx-auto w-full max-w-md lg:max-w-none">
+            <div class="absolute -inset-4 rounded-3xl bg-primary/10 blur-2xl"></div>
+
+            <div class="relative rounded-xl border border-border bg-surface/80 shadow-glow backdrop-blur-sm">
+              <!-- Barra do terminal -->
+              <div class="flex items-center gap-2 border-b border-border px-4 py-3">
+                <span class="h-3 w-3 rounded-full bg-muted/40"></span>
+                <span class="h-3 w-3 rounded-full bg-primary/50"></span>
+                <span class="h-3 w-3 rounded-full bg-accent/60"></span>
+                <span class="ml-3 font-mono text-xs text-muted">jmattosdev.tech — bash</span>
+              </div>
+              <!-- Código de exemplo (stack real do projeto) -->
+              <pre class="overflow-x-auto p-5 font-mono text-sm leading-relaxed text-muted"><code><span class="text-accent">➜</span> <span class="text-foreground">~</span> npm run dev
+<span class="text-primary-light">VITE</span> v8.2.1 ready in <span class="text-foreground">638ms</span>
+
+<span class="text-foreground">const stack</span> = <span class="text-foreground">{</span>
+  frontend: <span class="text-primary-light">["HTML5", "Tailwind", "JS"]</span>,
+  build: <span class="text-primary-light">["Vite"]</span>,
+  deploy: <span class="text-primary-light">["Nginx", "VPS"]</span>
+<span class="text-foreground">};</span></code></pre>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 2. Sobre mim -->

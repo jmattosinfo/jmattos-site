@@ -80,6 +80,18 @@
   padding-inline: var(--spacing-container);
 }
 
+/* Fundo em grid sutil com esmaecimento radial (usado no Hero).
+   O mask-image faz o grid sumir suavemente nas bordas. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(248 250 252 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(248 250 252 / 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+
+  -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 35%, black 35%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 60% at 50% 35%, black 35%, transparent 100%);
+}
+
 /* ============================================================
    3) ESTILOS BASE
    ============================================================ */

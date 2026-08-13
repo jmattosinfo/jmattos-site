@@ -28,22 +28,23 @@
 export const projetos = [
   {
     id: "projeto-1",
-    titulo: "[NOME DO PROJETO 1]",
-    descricaoCurta: "[DESCRIÇÃO CURTA DO PROJETO 1 — placeholder]",
-    problema: "[PROBLEMA OU OBJETIVO QUE O PROJETO 1 RESOLVE — placeholder]",
-    tecnologias: ["[TECNOLOGIA 1]", "[TECNOLOGIA 2]", "[TECNOLOGIA 3]"],
-    screenshot: null, // ex.: "screenshots/projeto-1.png"
+    titulo: "Finance Control (projeto em desenvolvimento)",
+    descricaoCurta: "Aplicação web completa para controle orçamentário, métricas em tempo real e relatórios operacionais centralizados.",
+    problema: "Centralizar o fluxo financeiro e operacional que antes era descentralizado em planilhas manuais, garantindo autenticação segura, persistência de dados íntegra e dashboard intuitivo.",
+    tecnologias: ["[Python]", "[Django]","[]Django Rest Framework]", "[Bootstrap]", "[SQLite]", "[Chart.js]"],
+    screenshot:"screenshots/projeto-1.gif",
     linkDemo: null, // ex.: "https://seu-dominio.com/projeto-1"
-    linkGitHub: null, // ex.: "https://github.com/seuusuario/projeto-1"
+    linkGitHub: "https://github.com/jmattosinfo/finance_control"
   },
   {
     id: "projeto-2",
-    titulo: "[NOME DO PROJETO 2]",
-    descricaoCurta: "[DESCRIÇÃO CURTA DO PROJETO 2 — placeholder]",
-    problema: "[PROBLEMA OU OBJETIVO QUE O PROJETO 2 RESOLVE — placeholder]",
-    tecnologias: ["[TECNOLOGIA 1]", "[TECNOLOGIA 2]"],
-    screenshot: null, // ex.: "screenshots/projeto-2.png"
-    linkDemo: null, // ex.: "https://seu-dominio.com/projeto-2"
-    linkGitHub: null, // ex.: "https://github.com/seuusuario/projeto-2"
+    titulo: "Ministério Acolher",
+    descricaoCurta: "Plataforma web gratuita, sigilosa e 100% online de acolhimento emocional e espiritual para homens e mulheres maiores de 18 anos que vivenciaram violência doméstica, divórcio ou abuso sexual, conectando cada pessoa a um profissional qualificado.",
+    problema: "Pessoas em situação de violência doméstica, divórcio ou abuso sexual enfrentam grande dificuldade para encontrar um espaço seguro, gratuito e confidencial de escuta e apoio emocional/espiritual, agravada pela falta de canais acessíveis que preservem a identidade e direcionem cada pessoa ao profissional adequado ao seu perfil.",
+    tecnologias: ["Node.js", "Express", "MySQL", "Tailwind CSS", "Chart.js", "Leaflet", "Nodemailer", "bcryptjs", "i18n"],
+    screenshot: "screenshots/projeto-2.png",
+    linkDemo: "https://acolher.life",
+    linkGitHub: "https://github.com/jmattosinfo/ministerio-acolher"
   },
 ];
+

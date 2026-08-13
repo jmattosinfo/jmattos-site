@@ -135,11 +135,11 @@
             </h1>
 
             <p class="mt-4 font-display text-lg text-primary-light sm:text-xl">
-              Software, Technology & Solutions
+              Full Stack Developer & Automação de Processos
             </p>
 
             <p class="mt-5 max-w-xl text-muted">
-              Desenvolvimento de software, tecnologia e soluções digitais — com simplicidade, performance e atenção aos detalhes.
+              Desenvolvimento de aplicações web modernas, APIs robustas e automações inteligentes (RPA) — unindo performance, código limpo e foco em resultados de negócio.
             </p>
 
             <div class="mt-9 flex flex-wrap items-center gap-4">
@@ -174,12 +174,20 @@
               </div>
               <!-- Código de exemplo (stack real do projeto) -->
               <pre class="overflow-x-auto p-5 font-mono text-sm leading-relaxed text-muted"><code><span class="text-accent">➜</span> <span class="text-foreground">~</span> npm run dev
-<span class="text-primary-light">VITE</span> v8.2.1 ready in <span class="text-foreground">638ms</span>
+<span class="text-warning">➜</span> <span class="text-foreground">~ source venv/bin/activate</span>
+
+<span class="text-success">(venv)</span> <span class="text-warning">➜</span> <span class="text-foreground">~ python manage.py runserver</span>
+
+<span class="text-primary-light">Django version 5.0, using settings 'core.settings'</span>
+
+<span class="text-foreground">Starting development server at http://127.0.0.1:8000/</span>
+<br>
 
 <span class="text-foreground">const stack</span> = <span class="text-foreground">{</span>
-  frontend: <span class="text-primary-light">["HTML5", "Tailwind", "JS"]</span>,
+  frontend: <span class="text-primary-light">["React", "HTML5/CSS3", "Tailwind", "JavaScript"]</span>,
+  backend: <span class="text-primary-light">["Python", "Django", "APIs REST"]</span>,
   build: <span class="text-primary-light">["Vite"]</span>,
-  deploy: <span class="text-primary-light">["Nginx", "VPS"]</span>
+  deploy: <span class="text-primary-light">["Linux", "Nginx", "VPS"]</span>
 <span class="text-foreground">};</span></code></pre>
             </div>
           </div>
@@ -197,22 +205,42 @@
           <!-- Texto -->
           <div class="max-w-3xl space-y-4 text-muted">
             <p>
-              [BREVE TEXTO SOBRE SUA TRAJETÓRIA — placeholder. Ex.: sua relação com a tecnologia e o que te levou ao desenvolvimento.]
+              Minha jornada começou com uma curiosidade técnica que me levou das
+          estruturas físicas de hardware e redes ao desenvolvimento de software.
+          Essa base sólida em infraestrutura hoje me proporciona uma visão
+          privilegiada para entender como as aplicações operam de forma mais eficiente.
             </p>
             <p>
-              [O QUE VOCÊ BUSCA — placeholder. Ex.: área de interesse, tipo de projetos, aprendizado contínuo.]
-            </p>
+          Hoje, foco em criar soluções web completas, integrando o poder do
+          Python e Django no backend com a interatividade do React no front.
+          Onde vejo processos repetitivos, construo automações (RPA) para transformá-los
+          em software escalável.
+        </p>
+        <p>
+          Procuro oportunidades desafiadoras para atuar como desenvolvedor,
+          continuar evoluindo em engenharia de software e contribuir para
+          soluções tecnológicas que geram impacto real.
+        </p>
           </div>
 
-          <!-- Foto: imagem dentro de um "anel" arredondado com gradiente azul suave -->
+          <!-- Foto: imagem dentro de um "anel" arredondado com gradiente azul suave
+               + glow azul (shadow-glow), bordas suaves e aura desfocada ao fundo -->
           <div class="mx-auto w-64 max-w-full sm:w-80 lg:w-full lg:max-w-sm">
-            <div class="rounded-[2rem] bg-linear-to-br from-primary via-primary/20 to-primary-light/60 p-1.5 shadow-glow">
-              <img
-                src="/jmattos.jpg"
-                alt="Julio Mattos — foto de perfil"
-                class="aspect-[4/5] w-full rounded-[1.55rem] object-cover"
-                loading="lazy"
-              />
+            <div class="relative">
+              <!-- Aura: luz de fundo desfocada (gradiente azul suave) atrás da foto -->
+              <div
+                aria-hidden="true"
+                class="pointer-events-none absolute -inset-8 rounded-full bg-linear-to-br from-primary/70 via-primary-light/30 to-transparent opacity-60 blur-3xl"
+              ></div>
+
+              <!-- Anel arredondado com gradiente azul + foto -->
+              <div class="relative rounded-full bg-linear-to-br from-primary via-primary/20 to-primary-light/60 p-1.5 shadow-glow">
+                <img
+                  src="/jmattos.png"
+                  alt="Julio Mattos — foto de perfil"
+                  class="aspect-square w-full rounded-full object-cover ring-2 ring-primary/40 ring-offset-4 ring-offset-background"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -226,105 +254,104 @@
       <section id="tecnologias" aria-labelledby="titulo-tecnologias" class="container-main py-section">
         <header class="max-w-2xl" data-reveal>
           <p class="font-mono text-xs uppercase tracking-widest text-accent">02 — Stack</p>
-          <h2 id="titulo-tecnologias" class="mt-3 text-3xl tracking-tight sm:text-4xl">Stack</h2>
+          <h2 id="titulo-tecnologias" class="mt-3 text-3xl tracking-tight sm:text-4xl">Tecnologias & Ferramentas</h2>
           <p class="mt-4 text-muted">
-            [DESCRIÇÃO CURTA SOBRE SUA STACK — placeholder. Ex.: ferramentas do dia a dia e o que estou estudando.]
-          </p>
+            Ecossistema tecnológico focado na construção de aplicações web de ponta a ponta. Priorizando robustez no backend, interfaces dinâmicas e automação de processos.
         </header>
 
         <div class="mt-12 grid gap-6 md:grid-cols-3">
-          <!-- Backend -->
+          <!-- Backend & Automação -->
           <article
             class="rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
           >
             <div class="flex items-center gap-3">
               <i data-lucide="server" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
-              <h3 class="text-lg">Backend</h3>
+              <h3 class="text-lg">Backend & Automação</h3>
             </div>
             <ul class="mt-6 space-y-3 text-sm">
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">Java</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
-              </li>
-              <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">Spring Boot</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
-              </li>
-              <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">Node.js</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
-              </li>
-              <li class="flex items-center justify-between gap-3">
                 <span class="text-foreground">Python</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
                 <span class="text-foreground">Django</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Java</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary-light" title="Estudo"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Spring Boot</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary-light" title="Estudo"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">RPA / Groq AI</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-accent" title="Interesse"></span>
               </li>
             </ul>
           </article>
 
-          <!-- Frontend -->
+          <!-- Frontend & Mobile -->
           <article
             class="rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
           >
             <div class="flex items-center gap-3">
               <i data-lucide="code-2" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
-              <h3 class="text-lg">Frontend</h3>
+              <h3 class="text-lg">Frontend & Mobile</h3>
             </div>
             <ul class="mt-6 space-y-3 text-sm">
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">HTML5</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
-              </li>
-              <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">CSS3</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="text-foreground">React</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
                 <span class="text-foreground">JavaScript</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">React</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="text-foreground">Tailwind CSS</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">Bootstrap</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="text-foreground">HTML5 / CSS3</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Conhecimento"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">React Native</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary-light" title="Estudo"></span>
               </li>
             </ul>
           </article>
 
-          <!-- Tools -->
+          <!-- Infra, Tools & Design -->
           <article
             class="rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
           >
             <div class="flex items-center gap-3">
               <i data-lucide="wrench" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
-              <h3 class="text-lg">Tools</h3>
+              <h3 class="text-lg">Infra, Tools & Design</h3>
             </div>
             <ul class="mt-6 space-y-3 text-sm">
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">Git</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="text-foreground">Git / GitHub</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">GitHub</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="text-foreground">Linux / VPS</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-primary" title="Experiência"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">Docker</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="text-foreground">Nginx</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Conhecimento"></span>
+              </li>
+              <li class="flex items-center justify-between gap-3">
+                <span class="text-foreground">Figma / Excalidraw</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Conhecimento"></span>
               </li>
               <li class="flex items-center justify-between gap-3">
                 <span class="text-foreground">VS Code</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
-              </li>
-              <li class="flex items-center justify-between gap-3">
-                <span class="text-foreground">IntelliJ IDEA</span>
-                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Nível: a definir"></span>
+                <span class="h-1.5 w-1.5 rounded-full bg-muted" title="Conhecimento"></span>
               </li>
             </ul>
           </article>
@@ -347,9 +374,9 @@
       <section id="projetos" aria-labelledby="titulo-projetos" class="container-main py-section">
         <header class="max-w-2xl" data-reveal>
           <p class="font-mono text-xs uppercase tracking-widest text-accent">03 — Projetos</p>
-          <h2 id="titulo-projetos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Projetos</h2>
+          <h2 id="titulo-projetos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Projetos em destaque</h2>
           <p class="mt-4 text-muted">
-            [POUCOS PROJETOS, BEM APRESENTADOS — placeholder. Cada projeto é tratado como um estudo de caso: contexto, problema e resultado.]
+            Aplicações desenvolvidas com foco em resolução de problemas reais, arquitetura limpa, performance e impacto direto na experiência do usuário.
           </p>
         </header>
 

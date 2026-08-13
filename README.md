@@ -1,8 +1,13 @@
 # JMATTOS.DEV
 
-Portfólio profissional de **Julio Mattos** — desenvolvimento de software, tecnologia e soluções digitais.
+Portfólio profissional de **Julio Mattos** — Full Stack Developer & Automação de Processos (RPA).
 
-![JMATTOS.DEV](public/jmattos.jpg)
+![JMATTOS.DEV](public/jmattos.png)
+
+## 📚 Documentação
+
+- [**DEPLOY.md**](DEPLOY.md) — guia completo de deploy no domínio (SFTP + Nginx + deploy automático/hot-reload)
+- [**AI_GUIDELINES.md**](AI_GUIDELINES.md) — padrões, regras e orientações para IAs que trabalharem neste projeto
 
 ## 📋 Projeto
 
@@ -10,18 +15,18 @@ Site pessoal/portfólio **estático** construído com **Vite + Tailwind CSS v4**
 
 Seções atuais:
 
-- **Hero** — apresentação com terminal decorativo
-- **Sobre** — texto + foto de perfil com moldura em gradiente azul
-- **Stack** — tecnologias com indicador de nível
-- **Projetos** — cards gerados dinamicamente
-- **Processo** — etapas de trabalho
+- **Hero** — apresentação com terminal decorativo (exemplo Django/Python)
+- **Sobre** — texto da trajetória + foto de perfil com moldura em gradiente azul e aura
+- **Stack** — tecnologias com indicador de nível (frontend, backend e infra/tools)
+- **Projetos** — cards gerados dinamicamente (estudo de caso com screenshots e links)
+- **Processo** — etapas de trabalho (Entender → Planejar → Desenvolver → Entregar)
 - **Serviços** — cards gerados dinamicamente
 - **Presença profissional** — redes/links externos
-- **Contato** — canal de comunicação
+- **Contato** — e-mail direto + formulário (mailto, sem backend)
 
 ## 🎯 Objetivo
 
-Apresentar a trajetória, a stack e os serviços de forma clara e profissional, servindo como vitrine para oportunidades de trabalho e novos projetos. O foco é **simplicidade, performance e atenção aos detalhes**, com código organizado e de fácil manutenção.
+Apresentar a trajetória, a stack e os serviços de forma clara e profissional, servindo como vitrine para oportunidades de trabalho e novos projetos. O foco é **simplicidade, performance e atenção aos detalhes**, com código organizado e de fácil manutenção — dados separados do HTML (arquivos `data/` como fonte única de verdade).
 
 ## 🧰 Stack (Tecnologias)
 
@@ -32,7 +37,9 @@ Apresentar a trajetória, a stack e os serviços de forma clara e profissional, 
 | Build     | Vite                                                    |
 | Ícones    | Lucide (via tree-shaking no bundle)                     |
 | Fontes    | Space Grotesk, Inter, JetBrains Mono (Google Fonts)     |
-| Deploy    | Nginx / VPS (futuro)                                    |
+| Deploy    | Nginx / VPS (extensão SFTP + deploy automático)         |
+
+> Backend das aplicações em destaque: Python/Django e Node.js/Express (ver [DEPLOY.md](DEPLOY.md) e `src/js/data/projects.js`).
 
 ## 🚀 Como executar localmente
 
@@ -57,9 +64,21 @@ O projeto estará disponível em **http://localhost:5173/** (com _hot reload_).
 # Gera os arquivos otimizados de produção em /dist
 npm run build
 
+# Gera o build e recompila automaticamente a cada alteração no código (usado no deploy com hot-reload)
+npm run build -- --watch
+
 # Pré-visualiza o build de produção localmente
 npm run preview
 ```
+
+## 🚢 Deploy
+
+O site é **estático** e publicado no domínio via **extensão SFTP do VSCode + Nginx**, com deploy automático a cada alteração salva (hot-reload). O guia completo está em **[DEPLOY.md](DEPLOY.md)** e cobre:
+
+- Configuração do `sftp.json` (upload automático ao salvar)
+- Estrutura de diretórios e permissões na VPS (`/home/deploy/jmattosdev.tech`)
+- Configuração e ativação do Nginx no domínio
+- Atualizações futuras e solução de problemas
 
 ## 📁 Estrutura básica
 
@@ -69,11 +88,14 @@ jmattosdev/
 ├── package.json            # Dependências e scripts
 ├── vite.config.js          # Config do Vite (plugin Tailwind v4)
 ├── .gitignore              # Arquivos ignorados pelo Git
+├── DEPLOY.md               # Guia de deploy (SFTP + Nginx)
+├── AI_GUIDELINES.md        # Regras e padrões para IAs do projeto
 ├── public/                 # Arquivos estáticos servidos na raiz
 │   ├── favicon.svg
-│   ├── jmattos.jpg
+│   ├── jmattos.png
 │   ├── robots.txt
-│   └── sitemap.xml
+│   ├── sitemap.xml
+│   └── screenshots/        # Screenshots dos projetos (projeto-1.gif, projeto-2.png)
 └── src/
     ├── css/
     │   └── style.css       # Design tokens + Tailwind CSS v4 (CSS-first)
@@ -90,16 +112,6 @@ jmattosdev/
             ├── presenca.js
             └── contato.js
 ```
-
-## 🚢 Deploy futuro
-
-Por ser um site estático, o build em `dist/` pode ser hospedado em qualquer plataforma:
-
-- **Nginx + VPS** — copiar `dist/` para o servidor e configurar o `server_root`
-- **Vercel / Netlify** — conectar o repositório, com `build command: npm run build` e `publish directory: dist`
-- **GitHub Pages** — publicar o conteúdo de `dist/` na branch `gh-pages`
-
-O `robots.txt` e o `sitemap.xml` já estão prontos em `public/` para o SEO.
 
 ---
 

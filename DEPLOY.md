@@ -1,119 +1,129 @@
-# DEPLOY — jmattosdev.tech (VPS + Nginx + dist/)
+# DEPLOY — jmattosdev.tech (SFTP + Nginx + deploy automático)
 
-Guia passo a passo para publicar o JMATTOS.DEV (landing page **estática**) na sua VPS.
+Guia passo a passo para publicar o JMATTOS.DEV (landing page **estática**) no seu domínio usando a **extensão SFTP do VSCode**.
 
 **Arquitetura:**
 
 ```
-Usuário → DNS (jmattosdev.tech → IP da VPS) → Nginx → /var/www/jmattosdev.tech (dist/)
+Usuário → DNS (jmattosdev.tech → IP da VPS) → Nginx → /home/deploy/jmattosdev.tech (conteúdo de dist/)
 ```
 
-> **Segurança:** antes de qualquer comando que altere Nginx ou firewall, leia a explicação.
-> Nenhum comando aqui é destrutivo por si só; os com `--delete` e `ufw` são destacados.
+**Fluxo de trabalho:**
+
+```
+Código local (src/) → npm run build -- --watch → dist/ → SFTP (upload automático ao salvar) → VPS → Nginx serve a versão mais recente
+```
+
+> **Hot-reload no servidor:** o projeto usa Vite. Rodando `npm run build -- --watch` + `uploadOnSave`/watcher do SFTP, **cada alteração salva no código local é enviada automaticamente para a VPS** e o Nginx passa a servir a nova versão imediatamente — sem precisar subir nada manualmente (basta atualizar a página no navegador com F5).
 
 ---
 
-## Pré-requisitos
+## 1. Pré-requisitos
 
-- Domínio `jmattosdev.tech` registrado e com acesso ao painel DNS.
-- VPS (Ubuntu/Debian) com acesso SSH e usuário com `sudo`.
-- Build local gerado: `npm run build` → pasta [`dist/`](dist).
+Antes de começar, confirme que você tem:
+
+- **VPS (Ubuntu/Debian)** com **Nginx instalado e rodando** (`systemctl status nginx`).
+- **Extensão SFTP instalada no VSCode** — a oficial do mercado: *SFTP* de **Natizyskunk** (ID: `Natizyskunk.sftp`). É ela que gerencia o upload e o deploy automático.
+- **Acesso SSH/SFTP** à VPS com o usuário **`deploy`** (host: `jmattosinfo`), autenticando por **chave SSH** (recomendado) ou senha.
+- **Domínio próprio** já registrado (ex.: `jmattosdev.tech`) e com **registro A no DNS apontando para o IP da VPS**.
+- **Projeto versionado no GitHub** (branch `main`) — o repositório é a fonte de verdade do código; o deploy apenas publica o build.
+- **Node.js + npm** instalados localmente (para gerar o build com `npm run build`).
 
 ---
 
-## Etapa 1 — DNS (feito no painel do registrador, NÃO no servidor)
+## 2. Configuração do SFTP no VSCode
 
-Crie dois registros **A**:
+### 2.1. Criar o arquivo `sftp.json`
 
-| Tipo | Nome/Host | Valor |
+Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e execute **`SFTP: Config`**. Isso cria o arquivo [`.vscode/sftp.json`](.vscode/sftp.json) na raiz do projeto.
+
+### 2.2. Conteúdo recomendado
+
+```json
+{
+    "name": "jmattosdev-vps",
+    "host": "jmattosinfo",
+    "protocol": "sftp",
+    "port": 22,
+    "username": "deploy",
+    "privateKeyPath": "~/.ssh/id_rsa",
+    "remotePath": "/home/deploy/jmattosdev.tech",
+    "context": "dist",
+    "uploadOnSave": true,
+    "ignore": [
+        "**/.git/**",
+        "**/.vscode/**",
+        "**/node_modules/**",
+        "**/*.map"
+    ],
+    "watcher": {
+        "files": "**/*",
+        "autoUpload": true,
+        "autoDelete": true
+    }
+}
+```
+
+**Explicação dos campos principais:**
+
+| Campo | Valor | O que faz |
 | --- | --- | --- |
-| A | `@` (ou `jmattosdev.tech`) | IP da VPS |
-| A | `www` | IP da VPS |
+| `host` | `jmattosinfo` | Endereço (hostname ou IP) da VPS. |
+| `username` | `deploy` | Usuário de acesso à VPS. |
+| `privateKeyPath` | `~/.ssh/id_rsa` | Caminho da chave privada SSH. **Alternativa:** use `"password": "SUA_SENHA"` (menos seguro). |
+| `remotePath` | `/home/deploy/jmattosdev.tech` | **Pasta de destino na VPS** — é o `root` que o Nginx vai servir. |
+| `context` | `dist` | Pasta **local** cujo conteúdo será enviado. Como o site é servido a partir do build, o SFTP envia o conteúdo de `dist/` direto para `remotePath`. |
+| `uploadOnSave` | `true` | Envia o arquivo para a VPS **toda vez que ele for salvo** (essencial para o hot-reload). |
+| `ignore` | `...` | Exclui pastas/arquivos desnecessários do upload (git, node_modules, maps). |
+| `watcher` | `autoUpload` | Observa a pasta `dist/` e faz **upload automático** quando o build regenera os arquivos. |
 
-- Verifique a propagação (pode levar minutos/horas):
-  ```bash
-  dig jmattosdev.tech +short
-  nslookup jmattosdev.tech
-  ```
-- ⚠️ O **Certbot (HTTPS)** só funciona depois que o domínio apontar para a VPS. As etapas 2–7 podem ser feitas antes da propagação.
+### 2.3. Primeiro upload (envio inicial)
 
----
+Após configurar o arquivo, faça o upload inicial de todo o `dist/`:
 
-## Etapa 2 — Conectar à VPS
-
-```bash
-ssh SEU_USUARIO@SEU_IP
-```
-
----
-
-## Etapa 3 — Atualizar sistema e instalar o Nginx
-
-**Explicação:** `apt update` baixa a lista atual de pacotes; `apt upgrade` aplica atualizações de segurança; `apt install nginx` instala o servidor web.
-
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y nginx
-```
+1. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** (ou `SFTP: Upload Folder`).
+2. Aguarde a barra de progresso no canto inferior direito.
+3. Confirme no servidor:
+   ```bash
+   ssh deploy@jmattosinfo
+   ls -la ~/jmattosdev.tech   # deve listar index.html e a pasta assets/
+   ```
 
 ---
 
-## Etapa 4 — Firewall (UFW no Ubuntu)
+## 3. Estrutura de diretórios na VPS e permissões
 
-**Explicação ANTES de executar:**
-- `ufw` (Uncomplicated Firewall) gerencia as regras de rede.
-- **Liberar SSH (porta 22) é OBRIGATÓRIO primeiro** — se você ativar o firewall sem liberar SSH, **perde o acesso ao servidor**.
-- `Nginx Full` libera as portas **80 (HTTP)** e **443 (HTTPS)**, necessárias para o site.
+O site fica no diretório **`/home/deploy/jmattosdev.tech`** (o `remotePath` do SFTP). A estrutura final:
 
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
-sudo ufw status
+```
+/home/deploy/jmattosdev.tech/
+├── index.html
+└── assets/
+    ├── index-*.js
+    └── index-*.css
 ```
 
-> **Atenção:** se a VPS usa outro firewall (painel do provedor/security group, ou `firewalld`), ajuste por lá. Verifique o painel do seu provedor para liberar 80/443 também.
+> O Nginx roda com o usuário `www-data`, então ele precisa de **permissão de leitura** (e de *atravessar* os diretórios) até o conteúdo. Ajuste as permissões no servidor:
+
+```bash
+# Garante que o home do usuário permita atravessar até o site
+chmod o+x /home/deploy
+
+# Dono: deploy (para o SFTP continuar escrevendo normalmente)
+sudo chown -R deploy:deploy /home/deploy/jmattosdev.tech
+
+# Permissões: 755 em diretórios e 644 em arquivos (leitura para o Nginx/www-data)
+find /home/deploy/jmattosdev.tech -type d -exec chmod 755 {} \;
+find /home/deploy/jmattosdev.tech -type f -exec chmod 644 {} \;
+```
+
+> **Dica:** rode os `chmod` acima novamente após cada deploy se você notar erros de permissão (`403 Forbidden`).
 
 ---
 
-## Etapa 5 — Confirmar o Nginx
+## 4. Configuração do Nginx (bloco do servidor)
 
-```bash
-sudo systemctl status nginx
-curl http://SEU_IP   # deve retornar a página padrão do Nginx
-```
-
----
-
-## Etapa 6 — Criar diretório e enviar o build
-
-**No servidor** (cria a pasta do site e dá permissão ao seu usuário):
-
-```bash
-sudo mkdir -p /var/www/jmattosdev.tech
-sudo chown -R $USER:$USER /var/www/jmattosdev.tech
-```
-
-**Na sua máquina local** (outro terminal, dentro da pasta do projeto `jmattosdev/`):
-
-```bash
-rsync -avz --delete dist/ SEU_USUARIO@SEU_IP:/var/www/jmattosdev.tech/
-```
-
-- `-a` preserva arquivos/permissões · `-z` comprime · `-v` mostra o progresso.
-- ⚠️ **`--delete`**: apaga no destino o que não existe mais na origem. Só usar apontando para a pasta **exata** do site (evita apagar arquivos de outros sites na mesma máquina).
-- Alternativa sem `rsync` (não remove arquivos obsoletos):
-  ```bash
-  scp -r dist/* SEU_USUARIO@SEU_IP:/var/www/jmattosdev.tech/
-  ```
-
----
-
-## Etapa 7 — Configurar o Nginx (bloco do site)
-
-**Explicação do que faz:** cria um arquivo de configuração que diz ao Nginx "para os domínios `jmattosdev.tech`/`www`, sirva os arquivos de `/var/www/jmattosdev.tech` na porta 80".
-
-Crie o arquivo:
+Crie um arquivo de configuração para o site em `/etc/nginx/sites-available/`:
 
 ```bash
 sudo nano /etc/nginx/sites-available/jmattosdev
@@ -127,96 +137,173 @@ server {
     listen [::]:80;
     server_name jmattosdev.tech www.jmattosdev.tech;
 
-    root /var/www/jmattosdev.tech;
-    index index.html;
+    root /home/deploy/jmattosdev.tech;
+    index index.html index.htm;
 
     location / {
         try_files $uri $uri/ =404;
     }
+
+    # Cache de assets com hash (imutáveis) — melhora performance
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Cabeçalhos de segurança básicos
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }
 ```
 
-- `listen 80` → escuta HTTP.
-- `server_name` → responde apenas para esses domínios.
-- `root` → pasta com o site.
-- `try_files ... =404` → busca o arquivo pedido; se não existir, retorna 404 (landing page estática, sem rotas SPA).
+**O que cada bloco faz:**
 
-**Ativar e testar (sem derrubar o servidor):**
+- `listen 80` → escuta na porta HTTP.
+- `server_name` → responde **apenas** para `jmattosdev.tech` e `www.jmattosdev.tech`.
+- `root` → **pasta de deploy** (o `remotePath` do SFTP).
+- `index index.html index.htm` → arquivo padrão servido na raiz.
+- `location /` com `try_files $uri $uri/ =404` → serve o arquivo pedido ou retorna 404 (site estático, sem rotas SPA).
+- `location /assets/` → cache longo para os arquivos gerados pelo build (nomes com hash).
+- `add_header ...` → cabeçalhos de segurança básicos.
+
+> **HTTPS (opcional):** depois que o DNS apontar para a VPS, você pode emitir certificado grátis com o Certbot:
+> ```bash
+> sudo apt install -y certbot python3-certbot-nginx
+> sudo certbot --nginx -d jmattosdev.tech -d www.jmattosdev.tech
+> ```
+
+---
+
+## 5. Ativação do site no Nginx
+
+Ative o site criando um **link simbólico** de `sites-available/` para `sites-enabled/`, teste a sintaxe e recarregue:
 
 ```bash
+# Ativa o site (link simbólico)
 sudo ln -s /etc/nginx/sites-available/jmattosdev /etc/nginx/sites-enabled/
-sudo nginx -t          # valida a sintaxe — NÃO aplica nada ainda (seguro)
-sudo systemctl reload nginx   # recarrega sem interromper conexões ativas
+
+# Testa a configuração — valida a sintaxe SEM aplicar nada ainda (seguro)
+sudo nginx -t
+
+# Aplica a nova configuração sem derrubar conexões ativas
+sudo systemctl reload nginx
+# ou
+sudo service nginx reload
 ```
+
+> **Esperado no `nginx -t`:** `syntax is ok` e `test is successful`. Se houver erro, corrija o arquivo e repita o `nginx -t` antes de recarregar.
 
 ---
 
-## Etapa 8 — HTTPS com Let's Encrypt (Certbot)
+## 6. Publicação no domínio
 
-**Explicação:** o Certbot emite o certificado SSL gratuito (90 dias), configura o Nginx para HTTPS e cria o redirect automático de HTTP → HTTPS. **Requer o DNS já apontando para a VPS (Etapa 1).**
+### 6.1. Validar o DNS
 
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d jmattosdev.tech -d www.jmattosdev.tech
-```
-
-Durante a execução, ele pergunta: e-mail para avisos, aceitar os termos e se deseja redirecionar HTTP → HTTPS (responda **sim**).
-
-**Renovação automática (testar):**
+Confirme que o domínio já resolve para o IP da VPS:
 
 ```bash
-sudo certbot renew --dry-run
+dig jmattosdev.tech +short
+nslookup jmattosdev.tech
+# Se aparecer o IP da sua VPS, o DNS está apontando corretamente.
 ```
+
+**Se o DNS ainda não resolver:** acesse o painel do registrador e crie/ajuste os registros **A**:
+
+| Tipo | Nome/Host | Valor |
+| --- | --- | --- |
+| A | `@` (ou `jmattosdev.tech`) | IP da VPS |
+| A | `www` | IP da VPS |
+
+> A propagação pode levar de minutos a algumas horas.
+
+### 6.2. Testar localmente na VPS (antes do navegador)
+
+```bash
+# Dentro da VPS: deve retornar o HTML do seu site
+curl -I http://localhost
+# Esperado: HTTP/1.1 200 OK
+```
+
+### 6.3. Acessar pelo navegador
+
+Abra **`http://jmattosdev.tech`** (e também `http://www.jmattosdev.tech`). Confirme:
+
+- A página carrega (hero, sobre, stack, projetos, serviços, contato).
+- Imagens e screenshots aparecem corretamente.
+- O menu mobile funciona.
+
+**Site no ar 🎉**
 
 ---
 
-## Etapa 9 — Validar a publicação
+## 7. Atualizações futuras (deploy automático / hot-reload)
 
-```bash
-# Página principal
-curl -I https://jmattosdev.tech          # esperado: HTTP/2 200
-# Redirect HTTP → HTTPS
-curl -I http://jmattosdev.tech           # esperado: 301 (Location: https://...)
-```
+### 7.1. Deploy automático ao salvar (recomendado)
 
-Abra `https://jmattosdev.tech` no navegador (cadeado 🔒) e confira as seções, imagens e o menu mobile.
+O objetivo é que **cada alteração local** já vá para o servidor sem esforço manual:
 
----
+1. **Deixe o build em modo watch rodando** em um terminal (gera o `dist/` atualizado a cada salvamento no `src/`):
+   ```bash
+   npm run build -- --watch
+   ```
+2. **Salve o código no VSCode** — o Vite recompila o `dist/` e a extensão SFTP (via `watcher` + `uploadOnSave`) **envia os arquivos alterados para a VPS automaticamente**.
+3. **Recarregue a página** no navegador (F5) para ver a mudança publicada.
 
-## 🔄 Como atualizar o site no futuro (GitHub → deploy)
+> Como o Nginx serve os arquivos da pasta `~/jmattosdev.tech` diretamente, **não é preciso reiniciar nem recarregar o Nginx** em atualizações de conteúdo (HTML/CSS/JS). Basta o upload ter sido feito.
 
-O fluxo depende de como o código chega ao servidor:
+### 7.2. Atualização manual com a extensão SFTP
 
-### Opção A — Deploy manual (recomendado agora, sem clonar repo na VPS)
+Se preferir um controle manual:
 
-1. Altere o código localmente e publique no GitHub:
+1. Altere o código e publique no GitHub como de costume:
    ```bash
    git add . && git commit -m "descrição da mudança" && git push
    ```
-2. Gere o build localmente:
+2. Gere o build:
    ```bash
    npm run build
    ```
-3. Envie para a VPS (repetir a Etapa 6):
-   ```bash
-   rsync -avz --delete dist/ SEU_USUARIO@SEU_IP:/var/www/jmattosdev.tech/
-   ```
-4. Pronto — o site já está atualizado (o Nginx serve os novos arquivos imediatamente).
+3. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** para enviar o novo `dist/` à VPS.
+4. Pronto — o site já está atualizado.
 
-### Opção B — Deploy no servidor (clonar o repositório na VPS)
+### 7.3. Alternativa: `git pull` no servidor
 
-1. Clone o repositório uma vez na VPS (ex.: `/home/SEU_USUARIO/jmattosdev`).
-2. A cada atualização, no servidor:
-   ```bash
-   cd /caminho/jmattosdev
-   git pull
-   npm ci          # instala as dependências exatas do package-lock.json
-   npm run build
-   rsync -avz --delete dist/ /var/www/jmattosdev.tech/
-   ```
-3. **Automatizar (opcional):** criar um script `deploy.sh` com os passos acima e dispará-lo por **GitHub Actions / webhook** ao fazer `git push`. Posso ajudar a montar isso.
+Se preferir versionar o deploy pelo servidor (requer Node.js/npm na VPS):
 
-> **Dica:** só use `sudo systemctl reload nginx` quando alterar a configuração do Nginx (Etapa 7/8) — para mudanças apenas de conteúdo (HTML/CSS/JS), basta atualizar a pasta `dist/`.
+```bash
+cd /home/deploy/jmattosdev
+git pull
+npm ci && npm run build
+rsync -avz --delete dist/ /home/deploy/jmattosdev.tech/
+```
+
+> **Atenção com `--delete`:** apaga no destino o que não existe mais na origem — use sempre apontando para a pasta **exata** do site.
+
+> **Dica:** o fluxo 7.1 (SFTP + build em watch) é o que entrega o "hot-reload" contínuo pedido, sem depender de Node.js na VPS.
+
+---
+
+## 8. Solução de problemas (troubleshooting)
+
+Verificações rápidas na ordem:
+
+| Sintoma | Verificação |
+| --- | --- |
+| Site fora do ar | `systemctl status nginx` na VPS — confira se o serviço está `active (running)`. |
+| Config do Nginx com erro | `sudo nginx -t` — corrija a sintaxe e rode `sudo systemctl reload nginx`. |
+| `403 Forbidden` | Permissões dos arquivos: rode os `chmod` da [seção 3](#3-estrutura-de-diretórios-na-vps-e-permissões). |
+| Página antiga / mudança não aparece | Confirme que o upload foi feito (`ls -la ~/jmattosdev.tech` e veja a data dos arquivos) e force o refresh (`Ctrl+Shift+R`). |
+| Domínio não abre, mas IP abre | DNS não apontou ainda: `dig jmattosdev.tech +short` — se vazio, aguarde a propagação ou ajuste o registro A. |
+| Upload SFTP não acontece | Confira o [`.vscode/sftp.json`](.vscode/sftp.json): host, username, `privateKeyPath`/`password`, `remotePath` e se `uploadOnSave`/`watcher` estão ativos. |
+| Nginx não responde na VPS | `curl -I http://localhost` — se retornar HTML do seu site, o problema é DNS/firewall; se não, revise `nginx -t` e o `server_name`. |
+| Portas 80/443 bloqueadas | No Ubuntu, confira o firewall: `sudo ufw status` → `Nginx Full` deve estar `ALLOW`. |
+
+**Comando de diagnóstico rápido (roda tudo em sequência):**
+
+```bash
+sudo systemctl status nginx && sudo nginx -t && ls -la /home/deploy/jmattosdev.tech && curl -I http://localhost
+```
 
 ---
 

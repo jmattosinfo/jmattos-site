@@ -37,7 +37,7 @@ Apresentar a trajetória, a stack e os serviços de forma clara e profissional, 
 | Build     | Vite                                                    |
 | Ícones    | Lucide (via tree-shaking no bundle)                     |
 | Fontes    | Space Grotesk, Inter, JetBrains Mono (Google Fonts)     |
-| Deploy    | Nginx / VPS (extensão SFTP + deploy automático)         |
+| Deploy    | CloudPanel / VPS (Nginx + extensão SFTP + deploy automático) |
 
 > Backend das aplicações em destaque: Python/Django e Node.js/Express (ver [DEPLOY.md](DEPLOY.md) e `src/js/data/projects.js`).
 
@@ -73,11 +73,12 @@ npm run preview
 
 ## 🚢 Deploy
 
-O site é **estático** e publicado no domínio via **extensão SFTP do VSCode + Nginx**, com deploy automático a cada alteração salva (hot-reload). O guia completo está em **[DEPLOY.md](DEPLOY.md)** e cobre:
+O site é **estático** e publicado no domínio via **CloudPanel (VPS) + extensão SFTP do VSCode**, com deploy automático a cada alteração salva (hot-reload). O guia completo está em **[DEPLOY.md](DEPLOY.md)** e cobre:
 
-- Configuração do `sftp.json` (upload automático ao salvar)
-- Estrutura de diretórios e permissões na VPS (`/home/deploy/jmattosdev.tech`)
-- Configuração e ativação do Nginx no domínio
+- Estrutura de sites do CloudPanel (web root em `/home/<site>/htdocs/<dominio>/`)
+- Criação do site no CloudPanel (Runtime: **Static**) e emissão do SSL (Let's Encrypt)
+- Configuração do `sftp.json` apontando para o web root (upload automático ao salvar)
+- DNS apontando para a VPS (registro A sem proxy)
 - Atualizações futuras e solução de problemas
 
 ## 📁 Estrutura básica

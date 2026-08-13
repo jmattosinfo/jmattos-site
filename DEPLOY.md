@@ -1,20 +1,20 @@
-# DEPLOY — jmattosdev.tech (SFTP + Nginx + deploy automático)
+# DEPLOY — jmattosdev.tech (CloudPanel + SFTP + deploy automático)
 
-Guia passo a passo para publicar o JMATTOS.DEV (landing page **estática**) no seu domínio usando a **extensão SFTP do VSCode**.
+Guia passo a passo para publicar o JMATTOS.DEV (landing page **estática**) no domínio usando o **CloudPanel** da VPS e a **extensão SFTP do VSCode**.
 
 **Arquitetura:**
 
 ```
-Usuário → DNS (jmattosdev.tech → IP da VPS) → Nginx → /home/deploy/jmattosdev.tech (conteúdo de dist/)
+Usuário → DNS (jmattosdev.tech → IP da VPS) → CloudPanel (Nginx) → /home/<site>/htdocs/jmattosdev.tech/
 ```
 
 **Fluxo de trabalho:**
 
 ```
-Código local (src/) → npm run build -- --watch → dist/ → SFTP (upload automático ao salvar) → VPS → Nginx serve a versão mais recente
+Código local (src/) → npm run build -- --watch → dist/ → SFTP (upload automático ao salvar) → VPS (web root do site no CloudPanel) → Nginx serve a versão mais recente
 ```
 
-> **Hot-reload no servidor:** o projeto usa Vite. Rodando `npm run build -- --watch` + `uploadOnSave`/watcher do SFTP, **cada alteração salva no código local é enviada automaticamente para a VPS** e o Nginx passa a servir a nova versão imediatamente — sem precisar subir nada manualmente (basta atualizar a página no navegador com F5).
+> **Hot-reload no servidor:** o projeto usa Vite. Rodando `npm run build -- --watch` + `uploadOnSave`/watcher do SFTP, **cada alteração salva no código local é enviada automaticamente para o web root do site no CloudPanel** e o Nginx passa a servir a nova versão imediatamente — sem reiniciar nada (basta atualizar a página no navegador com F5).
 
 ---
 
@@ -22,32 +22,59 @@ Código local (src/) → npm run build -- --watch → dist/ → SFTP (upload aut
 
 Antes de começar, confirme que você tem:
 
-- **VPS (Ubuntu/Debian)** com **Nginx instalado e rodando** (`systemctl status nginx`).
-- **Extensão SFTP instalada no VSCode** — a oficial do mercado: *SFTP* de **Natizyskunk** (ID: `Natizyskunk.sftp`). É ela que gerencia o upload e o deploy automático.
-- **Acesso SSH/SFTP** à VPS com o usuário **`deploy`** (host: `jmattosinfo`), autenticando por **chave SSH** (recomendado) ou senha.
-- **Domínio próprio** já registrado (ex.: `jmattosdev.tech`) e com **registro A no DNS apontando para o IP da VPS**.
+- **VPS (Ubuntu/Debian)** com **CloudPanel** instalado e funcionando. A VPS atual usa **CloudPanel v6** (acesso via CLI `clpctl`).
+- **Acesso ao painel do CloudPanel** — a UI fica em `https://IP-DA-VPS:8443` (ex.: `https://187.127.39.48:8443`).
+- **Extensão SFTP instalada no VSCode** — *SFTP* de **Natizyskunk** (ID: `Natizyskunk.sftp`). É ela que gerencia o upload automático.
+- **Acesso SFTP/SSH à VPS** com o usuário **`deploy`** (host: `187.127.39.48`), autenticando por **chave SSH** (recomendado) ou senha.
+- **Domínio próprio** já registrado (ex.: `jmattosdev.tech`) e com **registro A no DNS apontando para o IP da VPS** (sem proxy — ver seção 6).
 - **Projeto versionado no GitHub** (branch `main`) — o repositório é a fonte de verdade do código; o deploy apenas publica o build.
 - **Node.js + npm** instalados localmente (para gerar o build com `npm run build`).
 
 ---
 
-## 2. Configuração do SFTP no VSCode
+## 2. Entendendo a estrutura de sites do CloudPanel
 
-### 2.1. Criar o arquivo `sftp.json`
+O CloudPanel **gerencia os vhosts do Nginx automaticamente**. Você **não edita** `/etc/nginx/` na mão — tudo é feito pelo painel (ou via `sudo clpctl`).
+
+Para **cada site**, o CloudPanel cria um **usuário de sistema dedicado** com a seguinte estrutura (exemplo do site existente `acolher.life`):
+
+```
+/home/<usuario-do-site>/
+├── htdocs/
+│   └── <dominio>/      # ← WEB ROOT (pasta que o Nginx serve)
+├── logs/
+│   └── nginx/          # logs de acesso/erro do site
+├── backups/
+└── tmp/
+```
+
+- **Web root padrão:** `/home/<usuario>/htdocs/<dominio>/` — é **aqui** que o conteúdo do site deve ficar.
+- **Usuário do site:** criado pelo painel ao registrar o site (ex.: `acolher` → `/home/acolher`).
+- **Logs do site:** em `/home/<usuario>/logs/nginx/` (muito útil para troubleshooting).
+
+> ⚠️ **Importante:** o site **não pode** ser publicado numa pasta fora da estrutura do CloudPanel (ex.: `/home/deploy/jmattosdev.tech`). O Nginx do CloudPanel só serve o **web root do site** (`/home/<site>/htdocs/<dominio>/`).
+
+---
+
+## 3. Configuração do SFTP no VSCode
+
+### 3.1. Criar o arquivo `sftp.json`
 
 Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e execute **`SFTP: Config`**. Isso cria o arquivo [`.vscode/sftp.json`](.vscode/sftp.json) na raiz do projeto.
 
-### 2.2. Conteúdo recomendado
+### 3.2. Conteúdo recomendado
+
+> **Antes de definir o `remotePath`:** crie o site no CloudPanel (seção 4) e anote o caminho do web root que aparece no painel. Será algo como `/home/jmattosdev.tech/htdocs/jmattosdev.tech/` (o nome exato do usuário/pasta depende de como o site foi registrado).
 
 ```json
 {
-    "name": "jmattosdev-vps",
-    "host": "jmattosinfo",
+    "name": "jmattosdev-cloudpanel",
+    "host": "187.127.39.48",
     "protocol": "sftp",
     "port": 22,
     "username": "deploy",
-    "privateKeyPath": "~/.ssh/id_rsa",
-    "remotePath": "/home/deploy/jmattosdev.tech",
+    "privateKeyPath": "/home/jmattos/.ssh/id_ed25519",
+    "remotePath": "/home/jmattosdev.tech/htdocs/jmattosdev.tech",
     "context": "dist",
     "uploadOnSave": true,
     "ignore": [
@@ -68,16 +95,16 @@ Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e exe
 
 | Campo | Valor | O que faz |
 | --- | --- | --- |
-| `host` | `jmattosinfo` | Endereço (hostname ou IP) da VPS. |
+| `host` | `187.127.39.48` | IP da VPS (ou hostname). |
 | `username` | `deploy` | Usuário de acesso à VPS. |
-| `privateKeyPath` | `~/.ssh/id_rsa` | Caminho da chave privada SSH. **Alternativa:** use `"password": "SUA_SENHA"` (menos seguro). |
-| `remotePath` | `/home/deploy/jmattosdev.tech` | **Pasta de destino na VPS** — é o `root` que o Nginx vai servir. |
-| `context` | `dist` | Pasta **local** cujo conteúdo será enviado. Como o site é servido a partir do build, o SFTP envia o conteúdo de `dist/` direto para `remotePath`. |
+| `privateKeyPath` | `/home/jmattos/.ssh/id_ed25519` | Caminho da chave privada SSH. **Alternativa:** use `"password": "SUA_SENHA"` (menos seguro). |
+| `remotePath` | `/home/<site>/htdocs/<dominio>` | **Web root do site no CloudPanel** — o destino do upload. |
+| `context` | `dist` | Pasta **local** cujo conteúdo será enviado. Como o site é servido a partir do build, o SFTP envia o conteúdo de `dist/` direto para o web root. |
 | `uploadOnSave` | `true` | Envia o arquivo para a VPS **toda vez que ele for salvo** (essencial para o hot-reload). |
 | `ignore` | `...` | Exclui pastas/arquivos desnecessários do upload (git, node_modules, maps). |
 | `watcher` | `autoUpload` | Observa a pasta `dist/` e faz **upload automático** quando o build regenera os arquivos. |
 
-### 2.3. Primeiro upload (envio inicial)
+### 3.3. Primeiro upload (envio inicial)
 
 Após configurar o arquivo, faça o upload inicial de todo o `dist/`:
 
@@ -85,139 +112,67 @@ Após configurar o arquivo, faça o upload inicial de todo o `dist/`:
 2. Aguarde a barra de progresso no canto inferior direito.
 3. Confirme no servidor:
    ```bash
-   ssh deploy@jmattosinfo
-   ls -la ~/jmattosdev.tech   # deve listar index.html e a pasta assets/
+   ssh deploy@187.127.39.48
+   ls -la /home/<site>/htdocs/<dominio>   # deve listar index.html e a pasta assets/
    ```
 
 ---
 
-## 3. Estrutura de diretórios na VPS e permissões
+## 4. Criar o site no CloudPanel (web root)
 
-O site fica no diretório **`/home/deploy/jmattosdev.tech`** (o `remotePath` do SFTP). A estrutura final:
+O site `jmattosdev.tech` **precisa existir no CloudPanel** antes do upload. Faça pelo painel:
 
-```
-/home/deploy/jmattosdev.tech/
-├── index.html
-└── assets/
-    ├── index-*.js
-    └── index-*.css
-```
+1. Acesse **`https://187.127.39.48:8443`** no navegador (aceite o aviso de certificado auto-assinado na primeira vez).
+2. Faça login com o usuário/senha **administrador do CloudPanel**.
+3. Vá em **Websites → Add Website** (Adicionar site).
+4. Informe o **domínio principal**: `jmattosdev.tech`.
+5. Adicione o domínio adicional **`www.jmattosdev.tech`** (alias), se desejar.
+6. Em **Runtime**, escolha **Static** (site estático — não precisa de PHP/Node).
+7. Confirme. O CloudPanel vai criar:
+   - O **usuário do site** (ex.: `jmattosdev.tech` ou nome similar).
+   - O **web root** em `/home/<usuario>/htdocs/jmattosdev.tech/`.
+   - O **vhost do Nginx** automaticamente (não precisa mexer em `/etc/nginx`).
 
-> O Nginx roda com o usuário `www-data`, então ele precisa de **permissão de leitura** (e de *atravessar* os diretórios) até o conteúdo. Ajuste as permissões no servidor:
+> **Anote o web root exato** que aparece no painel (seção do site → "Document Root") — é esse caminho que vai no `remotePath` do [`sftp.json`](.vscode/sftp.json:8).
+
+### Alternativa via CLI (requer `sudo`)
+
+Na VPS, o CloudPanel pode criar o site pela linha de comando:
 
 ```bash
-# Garante que o home do usuário permita atravessar até o site
-chmod o+x /home/deploy
-
-# Dono: deploy (para o SFTP continuar escrevendo normalmente)
-sudo chown -R deploy:deploy /home/deploy/jmattosdev.tech
-
-# Permissões: 755 em diretórios e 644 em arquivos (leitura para o Nginx/www-data)
-find /home/deploy/jmattosdev.tech -type d -exec chmod 755 {} \;
-find /home/deploy/jmattosdev.tech -type f -exec chmod 644 {} \;
+sudo clpctl site:add --domainName=jmattosdev.tech --siteUser=jmattosdev.tech --siteUserPassword='SENHA'
 ```
 
-> **Dica:** rode os `chmod` acima novamente após cada deploy se você notar erros de permissão (`403 Forbidden`).
+> Consulte `sudo clpctl` para os comandos e parâmetros exatos da sua versão (CloudPanel 6).
 
 ---
 
-## 4. Configuração do Nginx (bloco do servidor)
+## 5. Publicação no domínio — DNS
 
-Crie um arquivo de configuração para o site em `/etc/nginx/sites-available/`:
+### 5.1. Apontar o DNS para a VPS (sem proxy)
 
-```bash
-sudo nano /etc/nginx/sites-available/jmattosdev
-```
+O domínio precisa resolver **direto** para o IP da VPS. No painel do seu provedor de domínio (Hostinger), ajuste os registros **desativando o proxy** (o toggle/globo azul dos registros DNS):
 
-Conteúdo:
+| Tipo | Nome/Host | Valor | Proxy |
+| --- | --- | --- | --- |
+| A | `@` (ou `jmattosdev.tech`) | **187.127.39.48** | **OFF** |
+| A | `www` | **187.127.39.48** | **OFF** |
 
-```nginx
-server {
-    listen 80;
-    listen [::]:80;
-    server_name jmattosdev.tech www.jmattosdev.tech;
+> Se houver um CNAME de `www` com proxy, remova-o e use um registro **A** direto, **sem proxy**. O proxy da Hostinger (`2.57.91.91`) **intercepta o desafio ACME do Let's Encrypt** e faz o Certbot falhar com erro `500`.
 
-    root /home/deploy/jmattosdev.tech;
-    index index.html index.htm;
+### 5.2. Validar o DNS
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    # Cache de assets com hash (imutáveis) — melhora performance
-    location /assets/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    # Cabeçalhos de segurança básicos
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-}
-```
-
-**O que cada bloco faz:**
-
-- `listen 80` → escuta na porta HTTP.
-- `server_name` → responde **apenas** para `jmattosdev.tech` e `www.jmattosdev.tech`.
-- `root` → **pasta de deploy** (o `remotePath` do SFTP).
-- `index index.html index.htm` → arquivo padrão servido na raiz.
-- `location /` com `try_files $uri $uri/ =404` → serve o arquivo pedido ou retorna 404 (site estático, sem rotas SPA).
-- `location /assets/` → cache longo para os arquivos gerados pelo build (nomes com hash).
-- `add_header ...` → cabeçalhos de segurança básicos.
-
-> **HTTPS (opcional):** depois que o DNS apontar para a VPS, você pode emitir certificado grátis com o Certbot:
-> ```bash
-> sudo apt install -y certbot python3-certbot-nginx
-> sudo certbot --nginx -d jmattosdev.tech -d www.jmattosdev.tech
-> ```
-
----
-
-## 5. Ativação do site no Nginx
-
-Ative o site criando um **link simbólico** de `sites-available/` para `sites-enabled/`, teste a sintaxe e recarregue:
-
-```bash
-# Ativa o site (link simbólico)
-sudo ln -s /etc/nginx/sites-available/jmattosdev /etc/nginx/sites-enabled/
-
-# Testa a configuração — valida a sintaxe SEM aplicar nada ainda (seguro)
-sudo nginx -t
-
-# Aplica a nova configuração sem derrubar conexões ativas
-sudo systemctl reload nginx
-# ou
-sudo service nginx reload
-```
-
-> **Esperado no `nginx -t`:** `syntax is ok` e `test is successful`. Se houver erro, corrija o arquivo e repita o `nginx -t` antes de recarregar.
-
----
-
-## 6. Publicação no domínio
-
-### 6.1. Validar o DNS
-
-Confirme que o domínio já resolve para o IP da VPS:
+Confirme que o domínio resolve para a VPS:
 
 ```bash
 dig jmattosdev.tech +short
-nslookup jmattosdev.tech
-# Se aparecer o IP da sua VPS, o DNS está apontando corretamente.
+dig www.jmattosdev.tech +short
+# Esperado: 187.127.39.48 (o IP da VPS)
 ```
-
-**Se o DNS ainda não resolver:** acesse o painel do registrador e crie/ajuste os registros **A**:
-
-| Tipo | Nome/Host | Valor |
-| --- | --- | --- |
-| A | `@` (ou `jmattosdev.tech`) | IP da VPS |
-| A | `www` | IP da VPS |
 
 > A propagação pode levar de minutos a algumas horas.
 
-### 6.2. Testar localmente na VPS (antes do navegador)
+### 5.3. Testar localmente na VPS (antes do navegador)
 
 ```bash
 # Dentro da VPS: deve retornar o HTML do seu site
@@ -225,15 +180,21 @@ curl -I http://localhost
 # Esperado: HTTP/1.1 200 OK
 ```
 
-### 6.3. Acessar pelo navegador
+---
 
-Abra **`http://jmattosdev.tech`** (e também `http://www.jmattosdev.tech`). Confirme:
+## 6. Emitir o certificado SSL (HTTPS) no CloudPanel
 
-- A página carrega (hero, sobre, stack, projetos, serviços, contato).
-- Imagens e screenshots aparecem corretamente.
-- O menu mobile funciona.
+O CloudPanel tem o **Let's Encrypt integrado** — não use o `certbot` manual. Pelo painel:
 
-**Site no ar 🎉**
+1. Acesse o site `jmattosdev.tech` em **Websites**.
+2. Vá na aba **SSL/TLS**.
+3. Clique em **Add / Issue Let's Encrypt Certificate**.
+4. Marque `jmattosdev.tech` e `www.jmattosdev.tech`.
+5. Confirme e aguarde a emissão (requer o DNS já apontando para a VPS — seção 5).
+
+O CloudPanel configura o vhost com HTTPS e o redirect HTTP → HTTPS automaticamente.
+
+> **Se o Let's Encrypt falhar com `unauthorized ... 500`**, a causa é o DNS ainda apontando para o proxy da Hostinger (`2.57.91.91`). Corrija os registros A (proxy OFF) e aguarde a propagação antes de tentar de novo.
 
 ---
 
@@ -247,10 +208,10 @@ O objetivo é que **cada alteração local** já vá para o servidor sem esforç
    ```bash
    npm run build -- --watch
    ```
-2. **Salve o código no VSCode** — o Vite recompila o `dist/` e a extensão SFTP (via `watcher` + `uploadOnSave`) **envia os arquivos alterados para a VPS automaticamente**.
+2. **Salve o código no VSCode** — o Vite recompila o `dist/` e a extensão SFTP (via `watcher` + `uploadOnSave`) **envia os arquivos alterados para o web root do site automaticamente**.
 3. **Recarregue a página** no navegador (F5) para ver a mudança publicada.
 
-> Como o Nginx serve os arquivos da pasta `~/jmattosdev.tech` diretamente, **não é preciso reiniciar nem recarregar o Nginx** em atualizações de conteúdo (HTML/CSS/JS). Basta o upload ter sido feito.
+> Como o Nginx do CloudPanel serve o web root diretamente, **não é preciso reiniciar nem recarregar o Nginx** em atualizações de conteúdo (HTML/CSS/JS). Basta o upload ter sido feito.
 
 ### 7.2. Atualização manual com a extensão SFTP
 
@@ -264,7 +225,7 @@ Se preferir um controle manual:
    ```bash
    npm run build
    ```
-3. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** para enviar o novo `dist/` à VPS.
+3. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** para enviar o novo `dist/` ao web root.
 4. Pronto — o site já está atualizado.
 
 ### 7.3. Alternativa: `git pull` no servidor
@@ -272,15 +233,15 @@ Se preferir um controle manual:
 Se preferir versionar o deploy pelo servidor (requer Node.js/npm na VPS):
 
 ```bash
-cd /home/deploy/jmattosdev
+cd /home/<site>/htdocs/<dominio>
 git pull
 npm ci && npm run build
-rsync -avz --delete dist/ /home/deploy/jmattosdev.tech/
+# Copie o build para o web root raiz se o site não for servido de subpasta
 ```
 
-> **Atenção com `--delete`:** apaga no destino o que não existe mais na origem — use sempre apontando para a pasta **exata** do site.
+> **Atenção:** para um site estático, o web root deve conter `index.html` + `assets/` na **raiz** (`/home/<site>/htdocs/<dominio>/`), não dentro de uma subpasta `dist`.
 
-> **Dica:** o fluxo 7.1 (SFTP + build em watch) é o que entrega o "hot-reload" contínuo pedido, sem depender de Node.js na VPS.
+> **Dica:** o fluxo 7.1 (SFTP + build em watch) é o que entrega o "hot-reload" contínuo, sem depender de Node.js na VPS.
 
 ---
 
@@ -291,19 +252,34 @@ Verificações rápidas na ordem:
 | Sintoma | Verificação |
 | --- | --- |
 | Site fora do ar | `systemctl status nginx` na VPS — confira se o serviço está `active (running)`. |
-| Config do Nginx com erro | `sudo nginx -t` — corrija a sintaxe e rode `sudo systemctl reload nginx`. |
-| `403 Forbidden` | Permissões dos arquivos: rode os `chmod` da [seção 3](#3-estrutura-de-diretórios-na-vps-e-permissões). |
-| Página antiga / mudança não aparece | Confirme que o upload foi feito (`ls -la ~/jmattosdev.tech` e veja a data dos arquivos) e force o refresh (`Ctrl+Shift+R`). |
-| Domínio não abre, mas IP abre | DNS não apontou ainda: `dig jmattosdev.tech +short` — se vazio, aguarde a propagação ou ajuste o registro A. |
-| Upload SFTP não acontece | Confira o [`.vscode/sftp.json`](.vscode/sftp.json): host, username, `privateKeyPath`/`password`, `remotePath` e se `uploadOnSave`/`watcher` estão ativos. |
-| Nginx não responde na VPS | `curl -I http://localhost` — se retornar HTML do seu site, o problema é DNS/firewall; se não, revise `nginx -t` e o `server_name`. |
+| Site responde "Empty reply" | O site provavelmente **não foi criado no CloudPanel** ou os arquivos estão fora do web root. Confirme se o site existe em `Websites` e se o `remotePath` do SFTP é o web root (`/home/<site>/htdocs/<dominio>/`). |
+| `403 Forbidden` | Permissões: rode `sudo clpctl system:permissions:reset --directories=770 --files=660 --path=/home/<site>/htdocs/<dominio>` (ou `chown`/`chmod` para o usuário do site). |
+| Página antiga / mudança não aparece | Confirme que o upload foi feito (`ls -la /home/<site>/htdocs/<dominio>`) e force o refresh (`Ctrl+Shift+R`). |
+| Domínio não abre, mas IP abre | DNS não apontou ainda: `dig jmattosdev.tech +short` — se resolver para `2.57.91.91` (proxy Hostinger), corrija os registros A (proxy OFF). |
+| Upload SFTP não acontece | Confira o [`.vscode/sftp.json`](.vscode/sftp.json:1): host, username, `privateKeyPath`/`password`, `remotePath` (web root) e se `uploadOnSave`/`watcher` estão ativos. |
+| Certbot/Let's Encrypt falha `unauthorized` | DNS apontando para o proxy (`2.57.91.91`). Desative o proxy nos registros A e aguarde a propagação. |
+| Nginx não responde na VPS | `curl -I http://localhost` — se retornar o HTML do site, o problema é DNS/firewall; se não, revise o site no CloudPanel e os logs em `/home/<site>/logs/nginx/`. |
 | Portas 80/443 bloqueadas | No Ubuntu, confira o firewall: `sudo ufw status` → `Nginx Full` deve estar `ALLOW`. |
+| Ver logs do site | `tail -f /home/<site>/logs/nginx/error.log` (e `access.log`). |
 
 **Comando de diagnóstico rápido (roda tudo em sequência):**
 
 ```bash
-sudo systemctl status nginx && sudo nginx -t && ls -la /home/deploy/jmattosdev.tech && curl -I http://localhost
+systemctl status nginx && curl -I http://localhost && ls -la /home/<site>/htdocs/<dominio> && dig jmattosdev.tech +short
 ```
+
+---
+
+## Resumo do fluxo de deploy
+
+1. Criar o site `jmattosdev.tech` no **CloudPanel** (Websites → Add Website, Runtime: **Static**).
+2. Anotar o **web root** do site (ex.: `/home/jmattosdev.tech/htdocs/jmattosdev.tech/`).
+3. Ajustar o `remotePath` do [`sftp.json`](.vscode/sftp.json:8) para o web root.
+4. Apontar o **DNS** (registro A `@` e `www` → IP da VPS, **proxy OFF**).
+5. Rodar `npm run build` e fazer o **upload inicial** (`SFTP: Sync Local -> Remote`).
+6. Emitir o **SSL** pelo CloudPanel (Let's Encrypt).
+7. Acessar `https://jmattosdev.tech` no navegador.
+8. Para atualizar: `npm run build -- --watch` + salvar (upload automático) → F5 no navegador.
 
 ---
 

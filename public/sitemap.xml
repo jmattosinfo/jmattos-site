@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- sitemap para JMATTOS.DEV: site de pagina unica (home).
-     IMPORTANTE: troque o dominio placeholder pelo real ao publicar. -->
+<!-- sitemap para JMATTOS.DEV: site de pagina unica (home). -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://SEU-DOMINIO.com/</loc>
+    <loc>https://jmattosdev.tech/</loc>
     <lastmod>2026-08-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>

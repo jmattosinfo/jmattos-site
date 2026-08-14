@@ -14,6 +14,14 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Força HTTPS no navegador (HSTS): após a 1ª visita via HTTPS, o navegador
+// passa a usar SOMENTE HTTPS, eliminando o aviso "Não seguro" em visitas
+// futuras (inclusive quando o usuário digita http:// na barra de endereço).
+app.use((req, res, next) => {
+  res.setHeader("Strict-Transport-Security", "max-age=31536000");
+  next();
+});
+
 // __dirname equivalente em ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -25,7 +25,7 @@ Antes de começar, confirme que você tem:
 - **VPS (Ubuntu/Debian)** com **CloudPanel** instalado e funcionando. A VPS atual usa **CloudPanel v6** (acesso via CLI `clpctl`).
 - **Acesso ao painel do CloudPanel** — a UI fica em `https://IP-DA-VPS:8443` (ex.: `https://187.127.39.48:8443`).
 - **Extensão SFTP instalada no VSCode** — *SFTP* de **Natizyskunk** (ID: `Natizyskunk.sftp`). É ela que gerencia o upload automático.
-- **Acesso SFTP/SSH à VPS** com o usuário **`deploy`** (host: `187.127.39.48`), autenticando por **chave SSH** (recomendado) ou senha.
+- **Acesso SFTP/SSH à VPS** com o **usuário do site** **`jmattosdev`** (host: `187.127.39.48`), autenticando por **chave SSH** (recomendado) ou senha.
 - **Domínio próprio** já registrado (ex.: `jmattosdev.tech`) e com **registro A no DNS apontando para o IP da VPS** (sem proxy — ver seção 6).
 - **Projeto versionado no GitHub** (branch `main`) — o repositório é a fonte de verdade do código; o deploy apenas publica o build.
 - **Node.js + npm** instalados localmente (para gerar o build com `npm run build`).
@@ -64,7 +64,7 @@ Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e exe
 
 ### 3.2. Conteúdo recomendado
 
-> **Antes de definir o `remotePath`:** crie o site no CloudPanel (seção 4) e anote o caminho do web root que aparece no painel. Será algo como `/home/jmattosdev.tech/htdocs/jmattosdev.tech/` (o nome exato do usuário/pasta depende de como o site foi registrado).
+> **Antes de definir o `remotePath`:** crie o site no CloudPanel (seção 4) e anote o caminho do web root que aparece no painel. Neste projeto é `/home/jmattosdev/htdocs/jmattosdev.tech/` (usuário do site `jmattosdev` — o nome exato pode variar conforme o registro no painel).
 
 ```json
 {
@@ -72,16 +72,19 @@ Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e exe
     "host": "187.127.39.48",
     "protocol": "sftp",
     "port": 22,
-    "username": "deploy",
+    "username": "jmattosdev",
     "privateKeyPath": "/home/jmattos/.ssh/id_ed25519",
-    "remotePath": "/home/jmattosdev.tech/htdocs/jmattosdev.tech",
-    "context": "dist",
+    "remotePath": "/home/jmattosdev/htdocs/jmattosdev.tech",
     "uploadOnSave": true,
     "ignore": [
         "**/.git/**",
         "**/.vscode/**",
         "**/node_modules/**",
-        "**/*.map"
+        "**/*.map",
+        "**/.gitignore",
+        "**/README.md",
+        "**/DEPLOY.md",
+        "**/AI_GUIDELINES.md"
     ],
     "watcher": {
         "files": "**/*",
@@ -91,29 +94,37 @@ Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e exe
 }
 ```
 
+> ⚠️ **Não use `"context": "dist"`.** Como o site é **NodeJS** (o [`server.js`](server.js) serve o `dist/`), o web root precisa conter o [`server.js`](server.js), o `package.json` e a pasta `dist/` **na raiz**. Usar `context` envia apenas o conteúdo de `dist/` "aplanado" no web root — o que quebra o Express (ele procura por `dist/index.html`) e causa **502 Bad Gateway**.
+
 **Explicação dos campos principais:**
 
 | Campo | Valor | O que faz |
 | --- | --- | --- |
 | `host` | `187.127.39.48` | IP da VPS (ou hostname). |
-| `username` | `deploy` | Usuário de acesso à VPS. |
+| `username` | `jmattosdev` | Usuário do site (dono do web root) usado no SFTP/SSH. |
 | `privateKeyPath` | `/home/jmattos/.ssh/id_ed25519` | Caminho da chave privada SSH. **Alternativa:** use `"password": "SUA_SENHA"` (menos seguro). |
-| `remotePath` | `/home/<site>/htdocs/<dominio>` | **Web root do site no CloudPanel** — o destino do upload. |
-| `context` | `dist` | Pasta **local** cujo conteúdo será enviado. Como o site é servido a partir do build, o SFTP envia o conteúdo de `dist/` direto para o web root. |
+| `remotePath` | `/home/<site>/htdocs/<dominio>` | **Web root do site no CloudPanel** — o destino do upload (a raiz, não o `dist/`). |
+| `context` | *(removido)* | **Não defina `context`.** A raiz do projeto é enviada por inteiro (com o `dist/` como subpasta) — necessário porque o site é NodeJS e o [`server.js`](server.js) precisa estar no web root. |
 | `uploadOnSave` | `true` | Envia o arquivo para a VPS **toda vez que ele for salvo** (essencial para o hot-reload). |
-| `ignore` | `...` | Exclui pastas/arquivos desnecessários do upload (git, node_modules, maps). |
-| `watcher` | `autoUpload` | Observa a pasta `dist/` e faz **upload automático** quando o build regenera os arquivos. |
+| `ignore` | `...` | Exclui pastas/arquivos desnecessários do upload (git, node_modules, docs, maps). |
+| `watcher` | `autoUpload` | Observa a raiz do projeto (incluindo o `dist/` regerado) e faz **upload automático** quando o build muda os arquivos. |
 
 ### 3.3. Primeiro upload (envio inicial)
 
-Após configurar o arquivo, faça o upload inicial de todo o `dist/`:
+Após configurar o arquivo, faça o upload inicial da **raiz do projeto** (que inclui o `dist/`):
 
 1. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** (ou `SFTP: Upload Folder`).
 2. Aguarde a barra de progresso no canto inferior direito.
-3. Confirme no servidor:
+3. Instale as dependências de produção no servidor (se ainda não houver `node_modules/`):
    ```bash
-   ssh deploy@187.127.39.48
-   ls -la /home/<site>/htdocs/<dominio>   # deve listar index.html e a pasta assets/
+   ssh jmattosdev@187.127.39.48
+   cd /home/<site>/htdocs/<dominio>
+   npm install --omit=dev
+   ```
+4. Confirme a estrutura no servidor:
+   ```bash
+   ls -la /home/<site>/htdocs/<dominio>        # deve listar server.js, package.json, node_modules/ e dist/
+   ls -la /home/<site>/htdocs/<dominio>/dist   # deve listar index.html e a pasta assets/
    ```
 
 ---
@@ -194,6 +205,8 @@ O CloudPanel tem o **Let's Encrypt integrado** — não use o `certbot` manual. 
 
 O CloudPanel configura o vhost com HTTPS e o redirect HTTP → HTTPS automaticamente.
 
+> **HSTS (HTTPS forçado no navegador):** o [`server.js`](server.js) envia o header `Strict-Transport-Security: max-age=31536000`. Após a 1ª visita via HTTPS, o navegador passa a usar **somente HTTPS** — eliminando o aviso "Não seguro" mesmo quando o usuário digita `http://` ou usa um favorito antigo. Como o header é enviado pelo Express, **toda alteração no `server.js` exige reiniciar o processo Node** (ver seção 7).
+
 > **Se o Let's Encrypt falhar com `unauthorized ... 500`**, a causa é o DNS ainda apontando para o proxy da Hostinger (`2.57.91.91`). Corrija os registros A (proxy OFF) e aguarde a propagação antes de tentar de novo.
 
 ---
@@ -213,7 +226,7 @@ O objetivo é que **cada alteração local** já vá para o servidor sem esforç
 2. **Salve o código no VSCode** — o Vite recompila o `dist/` e a extensão SFTP (via `watcher` + `uploadOnSave`) **envia os arquivos alterados para o web root do site automaticamente**.
 3. **Recarregue a página** no navegador (F5) para ver a mudança publicada.
 
-> Como o [`server.js`](server.js) (Express) serve os arquivos do web root, **não é preciso reiniciar o Nginx nem o Node** em atualizações de conteúdo (HTML/CSS/JS). Basta o upload ter sido feito.
+> Como o [`server.js`](server.js) (Express) serve os arquivos do web root, **não é preciso reiniciar o Nginx nem o Node** em atualizações de conteúdo (HTML/CSS/JS). Basta o upload ter sido feito (lembrando que o `dist/` fica **dentro** da pasta `dist/` no web root, e não aplanado na raiz).
 
 ### 7.2. Atualização manual com a extensão SFTP
 
@@ -227,8 +240,8 @@ Se preferir um controle manual:
    ```bash
    npm run build
    ```
-3. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** para enviar o novo `dist/` ao web root.
-4. Se o [`server.js`](server.js) mudou, **reinicie o processo Node** no CloudPanel.
+3. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** para enviar a raiz do projeto (incluindo o novo `dist/`) ao web root.
+4. Se o [`server.js`](server.js) ou o `package.json` mudaram, **reinstale as dependências** (`npm install --omit=dev` no servidor) e **reinicie o processo Node** no CloudPanel.
 5. Pronto — o site já está atualizado.
 
 ### 7.3. Alternativa: `git pull` no servidor
@@ -247,6 +260,22 @@ npm run build
 
 > **Dica:** o fluxo 7.1 (SFTP + build em watch) é o que entrega o "hot-reload" contínuo, sem depender de Node.js na VPS.
 
+### 7.4. Persistência do processo Node (sobreviver a reboot da VPS)
+
+Se o [`server.js`](server.js) foi iniciado via **PM2 manualmente** (não pelo botão do CloudPanel), registre o **startup** para que ele suba sozinho após um reboot da VPS:
+
+```bash
+ssh jmattosdev@187.127.39.48
+export NVM_DIR=/home/jmattosdev/.nvm && . "$NVM_DIR/nvm.sh"
+cd /home/<site>/htdocs/<dominio>
+pm2 start server.js --name jmattosdev   # se ainda não estiver rodando
+pm2 save
+# Registrar o boot do PM2 (exige sudo uma única vez):
+sudo env PATH=$PATH:/home/jmattosdev/.nvm/versions/node/v22.23.2/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u jmattosdev --hp /home/jmattosdev
+```
+
+> Se o site foi criado/gerenciado pelo CloudPanel, prefira o botão **Restart** no painel — ele registra o processo da forma oficial, dispensando o `pm2 startup` manual.
+
 ---
 
 ## 8. Solução de problemas (troubleshooting)
@@ -256,7 +285,7 @@ Verificações rápidas na ordem:
 | Sintoma | Verificação |
 | --- | --- |
 | Site fora do ar | `systemctl status nginx` na VPS — confira se o serviço está `active (running)`. |
-| **`502 Bad Gateway`** | O Nginx faz proxy para o **processo NodeJS que não está rodando**. Verifique: (1) o site está com runtime **NodeJS** no CloudPanel; (2) o [`server.js`](server.js) e o `dist/` estão no web root; (3) o processo Node está ativo — `curl http://127.0.0.1:3001/status` deve retornar `OK`; (4) reinicie o processo Node no CloudPanel (botão **Restart**). |
+| **`502 Bad Gateway`** | O Nginx faz proxy para o **processo NodeJS que não está rodando**. Verifique: (1) o site está com runtime **NodeJS** no CloudPanel; (2) o web root contém [`server.js`](server.js), `package.json`, `node_modules/` e o `dist/` **na raiz** (não "aplanado"); (3) as dependências estão instaladas (`npm install --omit=dev` no servidor); (4) o processo Node está ativo — `curl http://127.0.0.1:3001/status` deve retornar `OK`; (5) reinicie o processo Node no CloudPanel (botão **Restart**) ou via `pm2 restart jmattosdev`. |
 | Site responde "Empty reply" | O site provavelmente **não foi criado no CloudPanel** ou os arquivos estão fora do web root. Confirme se o site existe em `Websites` e se o `remotePath` do SFTP é o web root (`/home/<site>/htdocs/<dominio>/`). |
 | `403 Forbidden` | Permissões: rode `sudo clpctl system:permissions:reset --directories=770 --files=660 --path=/home/<site>/htdocs/<dominio>` (ou `chown`/`chmod` para o usuário do site). |
 | Página antiga / mudança não aparece | Confirme que o upload foi feito (`ls -la /home/<site>/htdocs/<dominio>`) e force o refresh (`Ctrl+Shift+R`). |
@@ -279,10 +308,10 @@ systemctl status nginx && curl -I http://localhost && ls -la /home/<site>/htdocs
 ## Resumo do fluxo de deploy
 
 1. Criar o site `jmattosdev.tech` no **CloudPanel** (Websites → Add Website, Runtime: **NodeJS**).
-2. Anotar o **web root** do site (ex.: `/home/jmattosdev.tech/htdocs/jmattosdev.tech/`).
+2. Anotar o **web root** do site (ex.: `/home/jmattosdev/htdocs/jmattosdev.tech/`).
 3. Ajustar o `remotePath` do [`sftp.json`](.vscode/sftp.json:8) para o web root.
 4. Apontar o **DNS** (registro A `@` e `www` → IP da VPS, **proxy OFF**).
-5. Rodar `npm ci && npm run build` e fazer o **upload inicial** (`SFTP: Sync Local -> Remote`) do `dist/`, do [`server.js`](server.js) e do `package.json` (e `node_modules` se o CloudPanel não instalar).
+5. Rodar `npm ci && npm run build` e fazer o **upload inicial** (`SFTP: Sync Local -> Remote`) da **raiz do projeto** (contém [`server.js`](server.js), `package.json` e `dist/`); instalar as dependências no servidor com `npm install --omit=dev`.
 6. Garantir que o processo Node está rodando na **porta 3001** (health check: `GET /status` → `OK`).
 7. Emitir o **SSL** pelo CloudPanel (Let's Encrypt).
 8. Acessar `https://jmattosdev.tech` no navegador.

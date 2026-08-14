@@ -106,14 +106,17 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
 
-    /* Nota: NÃO aplicamos overflow-x no <body>. Se overflow-x for
-       clip/hidden e overflow-y ficar "visible", o overflow-y é
-       computado como clip/hidden e — como o overflow do <body> é
-       propagado ao viewport quando o <html> é visible — a página
-       perderia o scroll vertical. A proteção anti-overflow horizontal
-       fica no <main> (ver index.html), que não é o root: cresce com
-       altura auto e não afeta o scroll do documento nem o header
-       position:sticky (que vive fora do <main>). */
+    /* Nota: NÃO aplicamos overflow-x no <body> nem no <main>.
+       • No <body>: se overflow-x for clip/hidden e overflow-y ficar
+         "visible", o overflow-y é computado como clip/hidden e — como
+         o overflow do <body> é propagado ao viewport quando o <html> é
+         visible — a página perderia o scroll vertical.
+       • No <main>: overflow-x em ancestral interfere no
+         IntersectionObserver do reveal on scroll (deixa seções com
+         data-reveal invisíveis).
+       A proteção anti-overflow é LOCALIZADA: cada seção com decoração
+       absoluta (glows/auras) usa overflow-hidden próprio — ver o hero e
+       a foto em "Sobre" no index.html. */
   }
 
   /* Títulos sempre usam Space Grotesk */

@@ -107,12 +107,12 @@
     </header>
 
     <!-- ======================= CONTEÚDO PRINCIPAL ======================= -->
-    <!-- overflow-x-clip: rede de segurança anti-overflow horizontal (no <main>
-         e não no <body> — evita cortar o scroll vertical e não afeta o header
-         position:sticky). Qualquer decoração absoluta (glows/auras) ou conteúdo
-         que ultrapasse o viewport no mobile é cortado aqui, sem criar barra de
-         rolagem horizontal. -->
-    <main id="conteudo" class="overflow-x-clip">
+    <!-- Nota anti-overflow: a proteção é feita de forma LOCALIZADA (cada seção
+         com decoração absoluta recebe overflow-hidden próprio — ver hero e a
+         foto em "Sobre"). NÃO aplicamos overflow-x no <main>: ele interfere no
+         IntersectionObserver do reveal on scroll (seções com data-reveal ficam
+         invisíveis) e não cobre o <header> position:sticky. -->
+    <main id="conteudo">
       <!-- 1. Hero -->
       <section
         id="hero"
@@ -232,7 +232,10 @@
           <!-- Foto: imagem dentro de um "anel" arredondado com gradiente azul suave
                + glow azul (shadow-glow), bordas suaves e aura desfocada ao fundo -->
           <div class="mx-auto w-64 max-w-full sm:w-80 lg:w-full lg:max-w-sm">
-            <div class="relative">
+            <!-- overflow-hidden: contém a aura desfocada (-inset-8) dentro do
+                 bloco da foto — impede vazar o viewport no mobile (telas estreitas)
+                 sem afetar o reveal on scroll das seções (foto não tem data-reveal) -->
+            <div class="relative overflow-hidden">
               <!-- Aura: luz de fundo desfocada (gradiente azul suave) atrás da foto -->
               <div
                 aria-hidden="true"

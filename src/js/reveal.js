@@ -43,4 +43,25 @@ export function initReveal() {
   );
 
   elementos.forEach((el) => observador.observe(el));
+
+  // ---------- Rede de segurança (fallback do IntersectionObserver) ----------
+  // Em casos raros o IO pode não disparar (ex.: clipping de ancestral com
+  // overflow, bug de navegador), deixando conteúdo com data-reveal "preso" em
+  // opacity: 0 (seções invisíveis). Este fallback revela os elementos que JÁ
+  // deveriam estar visíveis — no load e a cada scroll — garantindo que NADA
+  // fique permanentemente oculto. É redundante quando o IO funciona, e salva
+  // o layout quando ele falha.
+  const revelarVisiveis = () => {
+    elementos.forEach((el) => {
+      if (el.classList.contains("is-revealed")) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add("is-revealed");
+        observador.unobserve(el);
+      }
+    });
+  };
+
+  window.addEventListener("load", revelarVisiveis);
+  document.addEventListener("scroll", revelarVisiveis, { passive: true });
 }

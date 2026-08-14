@@ -2,7 +2,7 @@
 
 Portfólio profissional de **Julio Mattos** — Full Stack Developer & Automação de Processos (RPA).
 
-![JMATTOS.DEV](public/jmattos.png)
+![JMATTOS.DEV](public/jmattos.webp)
 
 ## 📚 Documentação
 
@@ -93,7 +93,7 @@ jmattosdev/
 ├── AI_GUIDELINES.md        # Regras e padrões para IAs do projeto
 ├── public/                 # Arquivos estáticos servidos na raiz
 │   ├── favicon.svg
-│   ├── jmattos.png
+│   ├── jmattos.webp
 │   ├── robots.txt
 │   ├── sitemap.xml
 │   └── screenshots/        # Screenshots dos projetos (projeto-1.gif, projeto-2.png)

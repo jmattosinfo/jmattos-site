@@ -84,17 +84,23 @@ Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e exe
         "**/.gitignore",
         "**/README.md",
         "**/DEPLOY.md",
-        "**/AI_GUIDELINES.md"
+        "**/AI_GUIDELINES.md",
+        "**/src/**",
+        "**/public/**",
+        "/index.html",
+        "/vite.config.js"
     ],
     "watcher": {
-        "files": "**/*",
+        "files": "dist/**/*",
         "autoUpload": true,
-        "autoDelete": true
+        "autoDelete": false
     }
 }
 ```
 
 > ⚠️ **Não use `"context": "dist"`.** Como o site é **NodeJS** (o [`server.js`](server.js) serve o `dist/`), o web root precisa conter o [`server.js`](server.js), o `package.json` e a pasta `dist/` **na raiz**. Usar `context` envia apenas o conteúdo de `dist/` "aplanado" no web root — o que quebra o Express (ele procura por `dist/index.html`) e causa **502 Bad Gateway**.
+
+> ⚠️ **`watcher.autoDelete` deve ser `false`.** Com o hot-reload (`npm run build -- --watch`), o Vite apaga/recria o `dist/` a cada salvamento; se `autoDelete: true`, o SFTP apaga os assets no servidor durante o rebuild → **site perde o estilo** (CSS/JS 404). Mantenha `autoDelete: false` e o `watcher.files` restrito a `dist/**/*`.
 
 **Explicação dos campos principais:**
 
@@ -107,7 +113,9 @@ Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e exe
 | `context` | *(removido)* | **Não defina `context`.** A raiz do projeto é enviada por inteiro (com o `dist/` como subpasta) — necessário porque o site é NodeJS e o [`server.js`](server.js) precisa estar no web root. |
 | `uploadOnSave` | `true` | Envia o arquivo para a VPS **toda vez que ele for salvo** (essencial para o hot-reload). |
 | `ignore` | `...` | Exclui pastas/arquivos desnecessários do upload (git, node_modules, docs, maps). |
-| `watcher` | `autoUpload` | Observa a raiz do projeto (incluindo o `dist/` regerado) e faz **upload automático** quando o build muda os arquivos. |
+| `ignore` | `...` | Exclui pastas que **não devem ir ao servidor**: `src/` e `public/` (o Vite já copia `public/` para o `dist/` no build) e os docs. |
+| `watcher.files` | `dist/**/*` | Observa **apenas** o `dist/` — é ele que o Express serve. Evita enviar/alterar arquivos de `src/`, `index.html` etc. |
+| `watcher.autoDelete` | `false` | **NUNCA use `true`** junto com `npm run build -- --watch`: o Vite apaga e recria o `dist/` a cada build e o SFTP interpreta como remoção, **deletando o `assets/` (CSS/JS) do servidor** — o site fica sem estilo. |
 
 ### 3.3. Primeiro upload (envio inicial)
 

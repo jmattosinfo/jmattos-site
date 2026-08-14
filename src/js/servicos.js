@@ -78,8 +78,6 @@ export function renderizarServicos() {
   container.innerHTML = `
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">${cards}</div>
     <p class="mt-8 max-w-2xl text-xs leading-relaxed text-muted">
-      [Nota — placeholder. Ex.: os serviços confirmados aparecerão aqui;
-      candidatos a inclusão futura: desenvolvimento web, sistemas,
-      APIs/integrações e suporte técnico.]
+      
     </p>`;
 }

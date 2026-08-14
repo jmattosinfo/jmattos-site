@@ -30,45 +30,45 @@ export const canais = [
   {
     nome: "GitHub",
     descricao:
-      "[O QUE O VISITANTE ENCONTRA NO SEU GITHUB — placeholder. Ex.: repositórios, projetos e código aberto.]",
+      "Repositórios de código aberto, projetos acadêmicos e aplicações práticas em desenvolvimento (incluindo os estudos de arquitetura e sistemas).",
     icone: "folder-git-2",
-    url: null,
+    url: "https://github.com/jmattosinfo/jmattosinfo",
     rotuloAcao: "Acessar perfil",
     externa: true,
   },
   {
     nome: "LinkedIn",
     descricao:
-      "[O QUE O VISITANTE ENCONTRA NO SEU LINKEDIN — placeholder. Ex.: trajetória, experiências e conexões profissionais.]",
+      "Minha trajetória profissional em tecnologia, histórico em suporte, redes e minha transição atual para o desenvolvimento de software.",
     icone: "briefcase",
-    url: null,
+    url: "https://www.linkedin.com/in/juliomattos-dev/",
     rotuloAcao: "Acessar perfil",
     externa: true,
   },
-  {
-    nome: "Instagram",
-    descricao:
-      "[O QUE O VISITANTE ENCONTRA NO SEU INSTAGRAM — placeholder. Ex.: bastidores, conteúdo técnico e atualizações.]",
-    icone: "camera",
-    url: null,
-    rotuloAcao: "Acessar perfil",
-    externa: true,
-  },
+  // {
+  //   nome: "Instagram",
+  //   descricao:
+  //     "Bastidores do aprendizado, rotina de estudos, conteúdos técnicos e atualizações sobre a evolução dos meus projetos.",
+  //   icone: "camera",
+  //   url: null,
+  //   rotuloAcao: "Acessar perfil",
+  //   externa: true,
+  // },
   {
     nome: "E-mail",
     descricao:
-      "[SEU E-MAIL PROFISSIONAL — placeholder. Ex.: para propostas, dúvidas e parcerias.]",
+      "Canal direto para propostas, dúvidas profissionais, parcerias ou contato comercial.",
     icone: "mail",
-    url: null,
+    url: "mailto:jmattosinfo@gmail.com",
     rotuloAcao: "Enviar e-mail",
     externa: false,
   },
   {
     nome: "WhatsApp",
     descricao:
-      "[EM BREVE — placeholder. Ex.: contato direto e rápido para demandas urgentes.]",
+      "Contato direto e ágil para conversas rápidas, dúvidas sobre serviços de TI e alinhamento de projetos.",
     icone: "message-circle",
-    url: null,
+    url: "https://wa.me/5551999009727?text=Oi%21%20Cheguei%20aqui%20pelo%20site%20e%20gostaria%20de%20falar%20contigo%20sobre",
     rotuloAcao: "Chamar no WhatsApp",
     externa: true,
   },

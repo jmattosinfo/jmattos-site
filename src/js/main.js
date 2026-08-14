@@ -17,6 +17,9 @@ import {
   Camera,
   MessageCircle,
   ArrowUpRight,
+  Workflow,
+  Headset,
+  ChartColumn,
 } from "lucide";
 import "../css/style.css";
 import { renderizarProjetos } from "./projects.js";
@@ -74,6 +77,10 @@ createIcons({
     Mail,
     MessageCircle,
     ArrowUpRight,
+    Code2,
+    Workflow,
+    Headset,
+    ChartColumn,
   },
 });
 

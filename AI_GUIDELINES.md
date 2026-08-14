@@ -150,7 +150,7 @@ jmattosdev/
 ├── AI_GUIDELINES.md        # Este arquivo
 ├── public/                 # Estáticos servidos na raiz
 │   ├── favicon.svg
-│   ├── jmattos.png
+│   ├── jmattos.webp
 │   ├── robots.txt
 │   ├── sitemap.xml
 │   └── screenshots/        # Imagens/screenshots dos projetos (ex.: projeto-1.png)

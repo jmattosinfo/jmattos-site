@@ -232,14 +232,15 @@
           <!-- Foto: imagem dentro de um "anel" arredondado com gradiente azul suave
                + glow azul (shadow-glow), bordas suaves e aura desfocada ao fundo -->
           <div class="mx-auto w-64 max-w-full sm:w-80 lg:w-full lg:max-w-sm">
-            <!-- overflow-hidden: contém a aura desfocada (-inset-8) dentro do
-                 bloco da foto — impede vazar o viewport no mobile (telas estreitas)
-                 sem afetar o reveal on scroll das seções (foto não tem data-reveal) -->
-            <div class="relative overflow-hidden">
+            <!-- A aura (luz de fundo desfocada) é LIVRE para emanar ao redor da foto
+                 (sem overflow-hidden, que cortaria o brilho). No mobile a aura é
+                 reduzida (max-sm:-inset-4) para não vazar o viewport em telas
+                 estreitas — o blur-3xl mantém o brilho suave. -->
+            <div class="relative">
               <!-- Aura: luz de fundo desfocada (gradiente azul suave) atrás da foto -->
               <div
                 aria-hidden="true"
-                class="pointer-events-none absolute -inset-8 rounded-full bg-linear-to-br from-primary/70 via-primary-light/30 to-transparent opacity-60 blur-3xl"
+                class="pointer-events-none absolute -inset-8 max-sm:-inset-4 rounded-full bg-linear-to-br from-primary/70 via-primary-light/30 to-transparent opacity-60 blur-3xl"
               ></div>
 
               <!-- Anel arredondado com gradiente azul + foto -->
@@ -635,7 +636,7 @@
 
     <!-- ======================= RODAPÉ ======================= -->
     <footer class="container-main border-t border-border py-8">
-      <p class="text-sm text-muted">© 2026 JMATTOS.DEV — [SEU NOME]</p>
+      <p class="text-sm text-muted">© 2026 JMATTOS.DEV — Júlio Mattos</p>
     </footer>
 
     <script type="module" src="/src/js/main.js"></script>

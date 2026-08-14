@@ -107,7 +107,12 @@
     </header>
 
     <!-- ======================= CONTEÚDO PRINCIPAL ======================= -->
-    <main id="conteudo">
+    <!-- overflow-x-clip: rede de segurança anti-overflow horizontal (no <main>
+         e não no <body> — evita cortar o scroll vertical e não afeta o header
+         position:sticky). Qualquer decoração absoluta (glows/auras) ou conteúdo
+         que ultrapasse o viewport no mobile é cortado aqui, sem criar barra de
+         rolagem horizontal. -->
+    <main id="conteudo" class="overflow-x-clip">
       <!-- 1. Hero -->
       <section
         id="hero"
@@ -121,23 +126,23 @@
           class="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
         ></div>
 
-        <div class="container-main relative grid items-center gap-12 py-20 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:py-0">
+        <div class="container-main relative grid items-center gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_1.1fr] lg:gap-16 lg:py-0">
           <!-- Texto -->
-          <div>
+          <div class="min-w-0">
             <p class="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-muted">
               <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
               JMATTOS.DEV
             </p>
 
-            <h1 id="titulo-hero" class="mt-5 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            <h1 id="titulo-hero" class="mt-5 text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Julio Mattos
             </h1>
 
-            <p class="mt-4 font-display text-lg text-primary-light sm:text-xl">
+            <p class="mt-4 max-w-xl font-display text-lg leading-snug text-balance text-primary-light sm:text-xl">
               Full Stack Developer & Automação de Processos
             </p>
 
-            <p class="mt-5 max-w-xl text-muted">
+            <p class="mt-5 max-w-xl text-pretty text-muted">
               Desenvolvimento de aplicações web modernas, APIs robustas e automações inteligentes (RPA) — unindo performance, código limpo e foco em resultados de negócio.
             </p>
 
@@ -160,10 +165,12 @@
           </div>
 
           <!-- Terminal: representação tecnológica discreta (decorativa) -->
-          <div aria-hidden="true" class="relative mx-auto w-full max-w-md lg:max-w-none">
+          <div aria-hidden="true" class="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none">
             <div class="absolute -inset-4 rounded-3xl bg-primary/10 blur-2xl"></div>
 
-            <div class="relative rounded-xl border border-border bg-surface/80 shadow-glow backdrop-blur-sm">
+            <!-- overflow-hidden: contém o <pre> (que rola internamente via
+                 overflow-x-auto) e impede o card de estourar o viewport no mobile -->
+            <div class="relative overflow-hidden rounded-xl border border-border bg-surface/80 shadow-glow backdrop-blur-sm">
               <!-- Barra do terminal -->
               <div class="flex items-center gap-2 border-b border-border px-4 py-3">
                 <span class="h-3 w-3 rounded-full bg-muted/40"></span>

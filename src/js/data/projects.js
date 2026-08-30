@@ -31,8 +31,8 @@ export const projetos = [
     titulo: "Finance Control (projeto em desenvolvimento)",
     descricaoCurta: "Aplicação web completa para controle orçamentário, métricas em tempo real e relatórios operacionais centralizados.",
     problema: "Centralizar o fluxo financeiro e operacional que antes era descentralizado em planilhas manuais, garantindo autenticação segura, persistência de dados íntegra e dashboard intuitivo.",
-    tecnologias: ["[Python]", "[Django]","[]Django Rest Framework]", "[Bootstrap]", "[SQLite]", "[Chart.js]"],
-    screenshot:"screenshots/projeto-1.gif",
+    tecnologias: ["Python", "Django", "Django REST Framework", "Bootstrap", "SQLite", "Chart.js"],
+    screenshot: "screenshots/projeto-1.gif",
     linkDemo: null, // ex.: "https://seu-dominio.com/projeto-1"
     linkGitHub: "https://github.com/jmattosinfo/finance_control"
   },

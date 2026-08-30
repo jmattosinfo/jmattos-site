@@ -6,33 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- SEO: título único + descrição (resumo em buscas e compartilhamentos) -->
-    <title>JMATTOS.DEV — Software, Technology & Solutions</title>
+    <title>JMATTOS.DEV — Full Stack Developer & Automação de Processos</title>
     <meta
       name="description"
-      content="Portfólio profissional de JMATTOS.DEV — desenvolvimento de software, tecnologia e soluções."
+      content="Full Stack Developer (Python/Django, React, Node.js) aberto a oportunidades de emprego e a projetos de sites, sistemas e automação. Conheça meu portfólio."
     />
 
-    <!-- Canonical: aponta a URL canônica (evita conteúdo duplicado entre
-         www/não-www, barra final, parâmetros etc.). -->
+    <!-- Canonical: aponta a URL canônica -->
     <link rel="canonical" href="https://jmattosdev.tech/" />
 
-    <!-- Open Graph (Facebook, LinkedIn, WhatsApp etc.): controla o preview ao
-         compartilhar. og:image ainda NÃO existe — crie uma imagem 1200×630 em
-         /public e adicione <meta property="og:image" content="https://SEU-DOMINIO.com/og-image.png" />
-         quando o arquivo estiver pronto. -->
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp etc.) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="JMATTOS.DEV" />
-    <meta property="og:title" content="JMATTOS.DEV — Software, Technology & Solutions" />
+    <meta property="og:title" content="JMATTOS.DEV — Full Stack Developer & Automação de Processos" />
     <meta
       property="og:description"
-      content="Portfólio profissional de JMATTOS.DEV — desenvolvimento de software, tecnologia e soluções."
+      content="Full Stack Developer (Python/Django, React, Node.js) aberto a oportunidades de emprego e a projetos de sites, sistemas e automação."
     />
     <meta property="og:url" content="https://jmattosdev.tech/" />
     <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content="https://jmattosdev.tech/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="JMATTOS.DEV — Julio Mattos | Full Stack Developer" />
 
-    <!-- Twitter/X Card: o X lê o Open Graph quando twitter:* não é declarado;
-         aqui só definimos o tipo (summary usa título + descrição). -->
-    <meta name="twitter:card" content="summary" />
+    <!-- Twitter/X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="JMATTOS.DEV — Full Stack Developer & Automação de Processos" />
+    <meta name="twitter:description" content="Full Stack Developer (Python/Django, React, Node.js) aberto a oportunidades e projetos." />
+    <meta name="twitter:image" content="https://jmattosdev.tech/og-image.svg" />
+
+    <!-- Dados estruturados Schema.org (JSON-LD) para SEO e rich snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://jmattosdev.tech/#person",
+          "name": "Julio Mattos",
+          "url": "https://jmattosdev.tech/",
+          "image": "https://jmattosdev.tech/jmattos.webp",
+          "jobTitle": "Full Stack Developer",
+          "description": "Desenvolvedor Full Stack especializado em Python/Django, React, Node.js e automação de processos (RPA).",
+          "sameAs": [
+            "https://github.com/jmattosinfo",
+            "https://www.linkedin.com/in/juliomattos-dev/"
+          ],
+          "knowsAbout": ["Python", "Django", "React", "JavaScript", "Node.js", "Tailwind CSS", "Linux", "RPA", "APIs REST"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://jmattosdev.tech/#website",
+          "url": "https://jmattosdev.tech/",
+          "name": "JMATTOS.DEV",
+          "description": "Portfólio profissional de Julio Mattos — Full Stack Developer & Automação de Processos.",
+          "publisher": {
+            "@id": "https://jmattosdev.tech/#person"
+          },
+          "inLanguage": "pt-BR"
+        }
+      ]
+    }
+    </script>
 
     <!-- Fontes: Space Grotesk (títulos), Inter (textos), JetBrains Mono (código) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -67,11 +103,21 @@
             <li><a href="#sobre" class="text-sm text-muted transition-colors hover:text-foreground">Sobre</a></li>
             <li><a href="#tecnologias" class="text-sm text-muted transition-colors hover:text-foreground">Stack</a></li>
             <li><a href="#projetos" class="text-sm text-muted transition-colors hover:text-foreground">Projetos</a></li>
-            <li><a href="#processo" class="text-sm text-muted transition-colors hover:text-foreground">Processo</a></li>
             <li><a href="#servicos" class="text-sm text-muted transition-colors hover:text-foreground">Serviços</a></li>
+            <li><a href="#processo" class="text-sm text-muted transition-colors hover:text-foreground">Processo</a></li>
             <li><a href="#contato" class="text-sm text-muted transition-colors hover:text-foreground">Contato</a></li>
           </ul>
         </nav>
+
+        <!-- CTA primário (desktop) — leva ao formulário de conversão.
+             Visível apenas a partir de md; no mobile o destaque fica no menu. -->
+        <a
+          href="#contato"
+          class="hidden items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/90 md:inline-flex"
+        >
+          Vamos conversar
+          <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+        </a>
 
         <!-- Botão do menu mobile (hamburger) — visível apenas abaixo de md -->
         <button
@@ -96,11 +142,22 @@
       >
         <!-- py-3 nos links: alvo de toque maior (~44px) no menu mobile -->
         <ul class="container-main flex flex-col gap-1 py-3">
+          <!-- Destaques: os dois caminhos de conversão (hub #caminhos) -->
+          <li>
+            <a href="#caminhos" data-caminho="vaga" class="block rounded-md bg-primary px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-primary/90">
+              Quer me contratar?
+            </a>
+          </li>
+          <li>
+            <a href="#caminhos" data-caminho="projeto" class="block rounded-md border border-border px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-2">
+              Quer um projeto/site?
+            </a>
+          </li>
           <li><a href="#sobre" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Sobre</a></li>
           <li><a href="#tecnologias" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Stack</a></li>
           <li><a href="#projetos" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Projetos</a></li>
-          <li><a href="#processo" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Processo</a></li>
           <li><a href="#servicos" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Serviços</a></li>
+          <li><a href="#processo" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Processo</a></li>
           <li><a href="#contato" class="block rounded-md px-3 py-3 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground">Contato</a></li>
         </ul>
       </nav>
@@ -128,11 +185,15 @@
 
         <div class="container-main relative grid items-center gap-12 py-16 lg:grid-cols-[minmax(0,1fr)_1.1fr] lg:gap-16 lg:py-0">
           <!-- Texto -->
-          <div class="min-w-0">
+          <div class="min-w-0" data-reveal="left">
             <p class="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-muted">
               <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
               JMATTOS.DEV
             </p>
+
+            <!-- Badge de disponibilidade (preenchido por src/js/disponibilidade.js
+                 a partir de data/disponibilidade.js — fonte única de estado) -->
+            <div data-disponibilidade-badge class="mt-4 flex flex-wrap items-center gap-2"></div>
 
             <h1 id="titulo-hero" class="mt-5 text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Julio Mattos
@@ -146,26 +207,33 @@
               Desenvolvimento de aplicações web modernas, APIs robustas e automações inteligentes (RPA) — unindo performance, código limpo e foco em resultados de negócio.
             </p>
 
+            <!-- CTAs priorizados: vaga (primário — foco atual) e projeto
+                 (secundário). Ambos levam ao hub #caminhos, que segmenta
+                 o próximo passo por público (destaca o card escolhido). -->
             <div class="mt-9 flex flex-wrap items-center gap-4">
               <a
-                href="#projetos"
+                href="#caminhos"
+                data-caminho="vaga"
+                data-cta-hero-vaga
                 class="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
               >
-                Ver projetos
+                <span data-cta-hero-vaga-texto>Oportunidades de vaga</span>
                 <i data-lucide="arrow-right" class="h-4 w-4"></i>
               </a>
               <a
-                href="#contato"
+                href="#caminhos"
+                data-caminho="projeto"
+                data-cta-hero-projeto
                 class="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
               >
-                <i data-lucide="mail" class="h-4 w-4"></i>
-                Entrar em contato
+                <i data-lucide="code-2" class="h-4 w-4 text-primary-light"></i>
+                <span data-cta-hero-projeto-texto>Contratar projeto/site</span>
               </a>
             </div>
           </div>
 
           <!-- Terminal: representação tecnológica discreta (decorativa) -->
-          <div aria-hidden="true" class="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none">
+          <div aria-hidden="true" class="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none" data-reveal="right">
             <div class="absolute -inset-4 rounded-3xl bg-primary/10 blur-2xl"></div>
 
             <!-- overflow-hidden: contém o <pre> (que rola internamente via
@@ -200,10 +268,28 @@
         </div>
       </section>
 
-      <!-- 2. Sobre mim -->
+      <!-- 2. Caminhos (hub de conversão)
+           A bifurcação VAGA x PROJETO. Os cards são GERADOS dinamicamente
+           por src/js/disponibilidade.js a partir de data/disponibilidade.js.
+           Este HTML contém apenas o cabeçalho da seção e um container vazio. -->
+      <section id="caminhos" aria-labelledby="titulo-caminhos" class="container-main py-section">
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">01 — Caminhos</p>
+          <h2 id="titulo-caminhos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Como posso te ajudar?</h2>
+          <p class="mt-4 text-muted">
+            Escolha o caminho que faz sentido para você: oportunidades de emprego
+            ou contratação de projetos. Cada um leva direto ao que você procura.
+          </p>
+        </header>
+
+        <!-- Container preenchido pela função initDisponibilidade() -->
+        <div data-caminhos class="mt-12 grid gap-6 md:grid-cols-2"></div>
+      </section>
+
+      <!-- 3. Sobre mim -->
       <section id="sobre" aria-labelledby="titulo-sobre" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">01 — Sobre</p>
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">02 — Sobre</p>
           <h2 id="titulo-sobre" class="mt-3 text-3xl tracking-tight sm:text-4xl">Sobre mim</h2>
         </header>
 
@@ -211,27 +297,25 @@
           <!-- Texto -->
           <div class="max-w-3xl space-y-4 text-muted">
             <p>
-              Minha jornada começou com uma curiosidade técnica que me levou das
-          estruturas físicas de hardware e redes ao desenvolvimento de software.
-          Essa base sólida em infraestrutura hoje me proporciona uma visão
-          privilegiada para entender como as aplicações operam de forma mais eficiente.
+              Minha jornada começou com uma curiosidade técnica que me levou das 
+              estruturas físicas de hardware e redes ao desenvolvimento de software. 
+              Essa base sólida em infraestrutura hoje me proporciona uma visão privilegiada 
+              para entender como as aplicações operam de forma mais eficiente.
             </p>
             <p>
-          Hoje, foco em criar soluções web completas, integrando o poder do
-          Python e Django no backend com a interatividade do React no front.
-          Onde vejo processos repetitivos, construo automações (RPA) para transformá-los
-          em software escalável.
+          Hoje, foco em criar soluções web completas, conectando arquiteturas robustas no backend 
+          a interfaces interativas no frontend. Onde vejo processos repetitivos, construo automações 
+          para transformá-los em software escalável.
         </p>
         <p>
-          Procuro oportunidades desafiadoras para atuar como desenvolvedor,
-          continuar evoluindo em engenharia de software e contribuir para
+          Sigo em constante evolução na engenharia de software, focado em construir e aprimorar 
           soluções tecnológicas que geram impacto real.
         </p>
           </div>
 
           <!-- Foto: imagem dentro de um "anel" arredondado com gradiente azul suave
                + glow azul (shadow-glow), bordas suaves e aura desfocada ao fundo -->
-          <div class="mx-auto w-64 max-w-full sm:w-80 lg:w-full lg:max-w-sm">
+          <div class="mx-auto w-64 max-w-full sm:w-80 lg:w-full lg:max-w-sm" data-reveal="left">
             <!-- A aura (luz de fundo desfocada) é LIVRE para emanar ao redor da foto
                  (sem overflow-hidden, que cortaria o brilho). No mobile a aura é
                  reduzida (max-sm:-inset-4) para não vazar o viewport em telas
@@ -262,8 +346,8 @@
            bg-primary = experiência · bg-primary-light = estudo · bg-accent = interesse
            E atualize o atributo title com o nível real. -->
       <section id="tecnologias" aria-labelledby="titulo-tecnologias" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">02 — Stack</p>
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">03 — Stack</p>
           <h2 id="titulo-tecnologias" class="mt-3 text-3xl tracking-tight sm:text-4xl">Tecnologias & Ferramentas</h2>
           <p class="mt-4 text-muted">
             Ecossistema tecnológico focado na construção de aplicações web de ponta a ponta. Priorizando robustez no backend, interfaces dinâmicas e automação de processos.
@@ -382,8 +466,8 @@
            Este HTML contém apenas o cabeçalho da seção e um container
            vazio — NENHUMA informação de projeto fica aqui. -->
       <section id="projetos" aria-labelledby="titulo-projetos" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">03 — Projetos</p>
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">04 — Projetos</p>
           <h2 id="titulo-projetos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Projetos em destaque</h2>
           <p class="mt-4 text-muted">
             Aplicações desenvolvidas com foco em resolução de problemas reais, arquitetura limpa, performance e impacto direto na experiência do usuário.
@@ -394,15 +478,36 @@
         <div data-projetos class="mx-auto mt-12 max-w-4xl space-y-10"></div>
       </section>
 
-      <!-- 5. Processo de trabalho
+      <!-- 5. Serviços
+           Os cards são GERADOS dinamicamente por src/js/servicos.js
+           a partir dos dados em src/js/data/servicos.js.
+           Este HTML contém apenas o cabeçalho da seção e um container
+           vazio — NENHUM serviço fica aqui.
+           Enquanto nenhum serviço for confirmado, o script exibe cards
+           placeholder "a confirmar" (nada é inventado). -->
+      <section id="servicos" aria-labelledby="titulo-servicos" class="container-main py-section">
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">05 — Serviços</p>
+          <h2 id="titulo-servicos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Serviços</h2>
+          <p class="mt-4 text-muted">
+            Soluções tecnológicas sob medida — desenvolvendo sites responsivos, sistemas web,
+            plataformas de gestão financeira e automação de processos para otimizar tempo e recursos.
+          </p>
+        </header>
+
+        <!-- Container preenchido pela função renderizarServicos() -->
+        <div data-servicos></div>
+      </section>
+
+      <!-- 6. Processo de trabalho
            Sequência visual 01 → 04: linhas finas + números pequenos.
            O amarelo aparece APENAS nos números e nas linhas de conexão
            (micro-acento, extremamente discreto).
            No desktop as linhas conectam os números; no mobile cada passo
            empilha com a sua própria linha. -->
       <section id="processo" aria-labelledby="titulo-processo" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">04 — Processo</p>
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">06 — Processo</p>
           <h2 id="titulo-processo" class="mt-3 text-3xl tracking-tight sm:text-4xl">Como trabalho</h2>
           <p class="mt-4 text-muted">
             Abordagem prática e estruturada — transformando ideias em aplicações web e mobile funcionais, 
@@ -469,26 +574,6 @@
         </ol>
       </section>
 
-      <!-- 6. Serviços
-           Os cards são GERADOS dinamicamente por src/js/servicos.js
-           a partir dos dados em src/js/data/servicos.js.
-           Este HTML contém apenas o cabeçalho da seção e um container
-           vazio — NENHUM serviço fica aqui.
-           Enquanto nenhum serviço for confirmado, o script exibe cards
-           placeholder "a confirmar" (nada é inventado). -->
-      <section id="servicos" aria-labelledby="titulo-servicos" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">05 — Serviços</p>
-          <h2 id="titulo-servicos" class="mt-3 text-3xl tracking-tight sm:text-4xl">Serviços</h2>
-          <p class="mt-4 text-muted">
-            Soluções tecnológicas sob medida — desenvolvendo sites responsivos, sistemas web, 
-            plataformas de gestão financeira e automação de processos para otimizar tempo e recursos.
-          </p>
-        </header>
-
-        <!-- Container preenchido pela função renderizarServicos() -->
-        <div data-servicos></div>
-      </section>
 
       <!-- 7. Presença profissional
            Canais do JMATTOS.DEV (GitHub, LinkedIn, Instagram, E-mail,
@@ -500,8 +585,8 @@
            Links externos usam target="_blank" rel="noopener noreferrer"
            (ver presenca.js). -->
       <section id="presenca" aria-labelledby="titulo-presenca" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">06 — Presença</p>
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">07 — Presença</p>
           <h2 id="titulo-presenca" class="mt-3 text-3xl tracking-tight sm:text-4xl">Presença profissional</h2>
           <p class="mt-4 text-muted">
             Conecte-se comigo — canais onde compartilho meus códigos, evolução nos estudos de desenvolvimento, 
@@ -514,64 +599,168 @@
       </section>
 
       <!-- 8. Contato
-           CTA + formulário SEM backend (v1).
-           O formulário NÃO finge envio: ao submeter, abre o aplicativo
-           de e-mail do visitante com a mensagem pronta (mailto),
-           montado por src/js/contato.js. Nenhum dado vai a servidor.
-           O e-mail de destino fica em src/js/data/contato.js.
-           Acessibilidade: labels associados, autocomplete, validação
-           nativa (required/type=email) e status anunciado via role="status". -->
+           CTA + formulário com envio REAL via POST /api/contato (server.js).
+           O formulário NÃO depende do app de e-mail do visitante: envia via
+           fetch para o Express. Se o servidor não estiver disponível, cai
+           (fallback honesto) para um mailto com a mensagem pronta — ver
+           src/js/contato.js.
+           Cards de canal: E-mail (link + copiar), WhatsApp (mesmo link do
+           botão flutuante) e tempo de resposta — dados em data/contato.js
+           e data/presenca.js.
+           Acessibilidade: labels associados, autocomplete, inputmode,
+           mensagens de erro via aria-describedby + aria-invalid, alvo de
+           toque >= 44px e status anunciado via role="status". -->
       <section id="contato" aria-labelledby="titulo-contato" class="container-main py-section">
-        <header class="max-w-2xl" data-reveal>
-          <p class="font-mono text-xs uppercase tracking-widest text-accent">07 — Contato</p>
+        <header class="max-w-2xl reveal-forte" data-reveal>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">08 — Contato</p>
           <h2 id="titulo-contato" class="mt-3 text-3xl tracking-tight sm:text-4xl">Tem um projeto em mente?</h2>
           <p class="mt-4 text-muted">
-            Vamos conversar. [MENSAGEM DE CONVITE AO CONTATO — placeholder. Ex.: conte
-            sobre sua ideia, objetivo e prazo — respondo o quanto antes.]
+            Vamos conversar sobre a sua ideia, necessidade de automação
+            ou demanda de TI — respondo o quanto antes.
           </p>
-          <a
-            href="#formulario-contato"
-            class="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
-          >
-            Vamos conversar
-            <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
-          </a>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href="#formulario-contato"
+              class="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
+            >
+              Vamos conversar
+              <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+            </a>
+            <a
+              data-contato-whatsapp
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+            >
+              <i data-lucide="message-circle" class="h-4 w-4 text-primary-light" aria-hidden="true"></i>
+              Chamar no WhatsApp
+            </a>
+          </div>
         </header>
 
         <div class="mt-14 grid gap-8 lg:grid-cols-[1fr_1.15fr] lg:items-start">
-          <!-- Opção direta: e-mail (texto/href preenchidos por contato.js) -->
+          <!-- Canais diretos (cards no padrão visual da seção Presença) -->
           <aside
-            aria-labelledby="titulo-contato-direto"
-            class="rounded-xl border border-border bg-surface p-6 lg:sticky lg:top-24"
+            aria-labelledby="titulo-contato-canais"
+            class="grid content-start gap-4 sm:grid-cols-2 lg:sticky lg:top-24 lg:grid-cols-1"
           >
-            <h3 id="titulo-contato-direto" class="text-lg">Prefere escrever direto?</h3>
-            <p class="mt-2 text-sm leading-relaxed text-muted">
-              [Nota — placeholder. Ex.: se preferir, envie um e-mail direto — sem
-              formulário.]
-            </p>
-            <a
-              data-contato-email
-              href="#"
-              class="mt-6 inline-flex max-w-full items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
-              aria-label="Enviar e-mail"
+            <h3 id="titulo-contato-canais" class="text-lg sm:col-span-2 lg:col-span-1">
+              Canais diretos
+            </h3>
+
+            <!-- Card E-mail -->
+            <article
+              class="flex flex-col rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
+              data-reveal
             >
-              <i data-lucide="mail" class="h-4 w-4 shrink-0 text-primary-light" aria-hidden="true"></i>
-              <span data-contato-email-text class="min-w-0 truncate">[SEU-EMAIL@EXEMPLO.com]</span>
-            </a>
+              <div class="flex items-center gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-2">
+                  <i data-lucide="mail" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+                </span>
+                <h4 class="text-base">E-mail</h4>
+              </div>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-muted">
+                Para propostas e contato profissional — envie direto ou copie o endereço.
+              </p>
+              <div class="mt-4 flex flex-wrap items-center gap-2">
+                <a
+                  data-contato-email
+                  href="#"
+                  class="inline-flex max-w-full min-h-11 items-center gap-2 rounded-md border border-border px-3.5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+                  aria-label="Enviar e-mail"
+                >
+                  <i data-lucide="mail" class="h-4 w-4 shrink-0 text-primary-light" aria-hidden="true"></i>
+                  <span data-contato-email-text class="min-w-0 truncate">jmattosinfo@gmail.com</span>
+                </a>
+                <button
+                  type="button"
+                  data-contato-copiar
+                  class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+                  aria-label="Copiar e-mail para a área de transferência"
+                  title="Copiar e-mail"
+                >
+                  <i data-lucide="copy" class="h-4 w-4" aria-hidden="true" data-copiar-icone></i>
+                  <i data-lucide="check" class="hidden h-4 w-4 text-success" aria-hidden="true" data-copiar-ok></i>
+                </button>
+              </div>
+            </article>
+
+            <!-- Card WhatsApp -->
+            <article
+              class="flex flex-col rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
+              data-reveal
+              style="--reveal-delay: 70ms"
+            >
+              <div class="flex items-center gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-2">
+                  <i data-lucide="message-circle" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+                </span>
+                <h4 class="text-base">WhatsApp</h4>
+              </div>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-muted">
+                Conversas rápidas, dúvidas sobre serviços e alinhamento de projetos.
+              </p>
+              <a
+                data-contato-whatsapp
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-light transition-colors hover:text-foreground"
+                aria-label="Chamar no WhatsApp — abre em nova aba"
+              >
+                Chamar no WhatsApp
+                <i data-lucide="arrow-up-right" class="h-4 w-4" aria-hidden="true"></i>
+              </a>
+            </article>
+
+            <!-- Card Tempo de resposta -->
+            <article
+              class="flex flex-col rounded-xl border border-border bg-surface p-6 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-primary/40"
+              data-reveal
+              style="--reveal-delay: 140ms"
+            >
+              <div class="flex items-center gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-2">
+                  <i data-lucide="clock" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+                </span>
+                <h4 class="text-base">Tempo de resposta</h4>
+              </div>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-muted">
+                <span data-contato-resposta>Respondo em até 24h úteis.</span>
+                Mensagens fora do horário comercial são atendidas no próximo dia útil.
+              </p>
+            </article>
           </aside>
 
-          <!-- Formulário: monta mailto (sem backend, sem fingir envio) -->
+          <!-- Formulário: envio real via POST /api/contato (fallback: mailto) -->
           <form
             data-contato-form
             id="formulario-contato"
-            class="rounded-xl border border-border bg-surface p-6 sm:p-8"
+            class="relative rounded-xl border border-border bg-surface p-6 sm:p-8"
             aria-describedby="nota-formulario-contato"
           >
             <h3 class="text-lg">Ou preencha o formulário</h3>
             <p class="mt-2 text-sm leading-relaxed text-muted">
-              [Nota — placeholder. Ex.: preencha os campos abaixo e a mensagem será
-              montada no seu aplicativo de e-mail (mailto).]
+              Preencha os campos abaixo e a mensagem chega direto ao meu e-mail.
             </p>
+
+            <!-- Honeypot anti-spam: campo oculto (fora da viewport) que só bots
+                 preenchem. Se preenchido, o envio é descartado silenciosamente
+                 (ver src/js/contato.js + server.js). -->
+            <div
+              aria-hidden="true"
+              class="pointer-events-none absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden"
+            >
+              <label for="contato-empresa">Não preencha este campo</label>
+              <input
+                id="contato-empresa"
+                name="empresa"
+                type="text"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
 
             <div class="mt-7 grid gap-5 sm:grid-cols-2">
               <div class="flex flex-col gap-1.5">
@@ -583,8 +772,10 @@
                   required
                   autocomplete="name"
                   placeholder="Seu nome"
-                  class="rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
+                  aria-describedby="erro-contato-nome"
+                  class="rounded-md border border-border bg-background px-3.5 py-3 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
                 />
+                <p id="erro-contato-nome" class="hidden text-xs text-danger"></p>
               </div>
               <div class="flex flex-col gap-1.5">
                 <label for="contato-email" class="text-sm font-medium">Seu e-mail</label>
@@ -594,10 +785,26 @@
                   type="email"
                   required
                   autocomplete="email"
+                  inputmode="email"
+                  enterkeyhint="next"
                   placeholder="voce@exemplo.com"
-                  class="rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
+                  aria-describedby="erro-contato-email"
+                  class="rounded-md border border-border bg-background px-3.5 py-3 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
                 />
+                <p id="erro-contato-email" class="hidden text-xs text-danger"></p>
               </div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-1.5">
+              <label for="contato-tipo" class="text-sm font-medium">Assunto do contato</label>
+              <select
+                id="contato-tipo"
+                name="tipo"
+                data-contato-tipo
+                class="rounded-md border border-border bg-background px-3.5 py-3 text-sm text-foreground transition-colors focus:border-primary"
+              >
+                <option value="">Selecione o assunto (opcional)</option>
+              </select>
             </div>
 
             <div class="mt-5 flex flex-col gap-1.5">
@@ -607,37 +814,136 @@
                 name="mensagem"
                 rows="5"
                 required
+                enterkeyhint="done"
                 placeholder="Conte sobre o seu projeto..."
-                class="resize-y rounded-md border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
+                aria-describedby="erro-contato-mensagem"
+                class="resize-y rounded-md border border-border bg-background px-3.5 py-3 text-sm text-foreground transition-colors placeholder:text-muted/60 focus:border-primary"
               ></textarea>
+              <p id="erro-contato-mensagem" class="hidden text-xs text-danger"></p>
             </div>
 
             <div class="mt-7 flex flex-wrap items-center gap-4">
               <button
                 type="submit"
-                class="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/90"
+                class="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Preparar mensagem
-                <i data-lucide="mail" class="h-4 w-4" aria-hidden="true"></i>
+                <i data-lucide="send" class="h-4 w-4" aria-hidden="true" data-submit-icone-enviar></i>
+                <i data-lucide="check" class="hidden h-4 w-4" aria-hidden="true" data-submit-icone-ok></i>
+                <span data-contato-submit-text>Enviar mensagem</span>
               </button>
               <p id="nota-formulario-contato" class="max-w-xs text-xs leading-relaxed text-muted">
-                [Nota — placeholder. Ex.: ao enviar, seu aplicativo de e-mail abre
-                com a mensagem pronta. Esta versão não envia dados por servidor.]
+                Ao enviar, a mensagem chega direto ao meu e-mail. Respondo em até 24h úteis.
               </p>
             </div>
 
             <!-- Status (anunciado a leitores de tela via role="status").
-                 Só aparece quando o e-mail de destino ainda não foi configurado. -->
-            <p data-contato-status role="status" hidden class="mt-4 rounded-md border border-accent/30 bg-accent/10 px-3 py-2 text-xs text-foreground"></p>
+                 Mostra progresso, sucesso ou aviso conforme o envio. -->
+            <p data-contato-status role="status" hidden class="mt-4 rounded-md border px-3 py-2 text-sm"></p>
           </form>
         </div>
       </section>
     </main>
 
-    <!-- ======================= RODAPÉ ======================= -->
-    <footer class="container-main border-t border-border py-8">
-      <p class="text-sm text-muted">© 2026 JMATTOS.DEV — Júlio Mattos</p>
+    <!-- ======================= RODAPÉ =======================
+         Dois blocos de caminho (recrutadores x clientes) + contato direto,
+         para manter a conversão acessível em scrolls longos. Os links de
+         canais (LinkedIn, GitHub, WhatsApp, E-mail) são preenchidos por
+         src/js/disponibilidade.js a partir de data/presenca.js (fonte única). -->
+    <footer class="container-main border-t border-border py-10">
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Para recrutadores -->
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">Para recrutadores</p>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li><a href="#sobre" class="text-muted transition-colors hover:text-foreground">Perfil completo</a></li>
+            <li><a href="#projetos" class="text-muted transition-colors hover:text-foreground">Projetos e portfólio</a></li>
+            <li><a href="#contato" data-assunto="vaga" class="text-muted transition-colors hover:text-foreground">Enviar proposta de vaga</a></li>
+            <li><a href="#" data-canal-linkedin class="text-muted transition-colors hover:text-foreground">LinkedIn</a></li>
+            <li><a href="#" data-canal-github class="text-muted transition-colors hover:text-foreground">GitHub</a></li>
+          </ul>
+        </div>
+
+        <!-- Para clientes -->
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">Para clientes</p>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li><a href="#servicos" class="text-muted transition-colors hover:text-foreground">Serviços</a></li>
+            <li><a href="#processo" class="text-muted transition-colors hover:text-foreground">Como trabalho</a></li>
+            <li><a href="#projetos" class="text-muted transition-colors hover:text-foreground">Casos de uso</a></li>
+            <li><a href="#contato" class="text-muted transition-colors hover:text-foreground">Solicitar orçamento</a></li>
+            <li><a href="#" data-canal-whatsapp class="text-muted transition-colors hover:text-foreground">WhatsApp</a></li>
+          </ul>
+        </div>
+
+        <!-- Contato direto -->
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-accent">Contato direto</p>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li><a href="#" data-canal-email class="text-muted transition-colors hover:text-foreground">E-mail</a></li>
+            <li><a href="#caminhos" class="text-muted transition-colors hover:text-foreground">Escolher um caminho</a></li>
+          </ul>
+          <p class="mt-4 text-xs leading-relaxed text-muted">Respondo em até 24h úteis.</p>
+        </div>
+      </div>
+
+      <p class="mt-10 border-t border-border pt-6 text-sm text-muted">© 2026 JMATTOS.DEV — Júlio Mattos</p>
     </footer>
+
+    <!-- ======================= BOTÃO FLUTUANTE WHATSAPP =======================
+         Link fixo no canto inferior direito (position:fixed) que abre uma
+         conversa no WhatsApp com mensagem pré-preenchida.
+         O href é preenchido por src/js/whatsapp.js a partir da URL do canal
+         "WhatsApp" em src/js/data/presenca.js (fonte única de verdade).
+         Ícone resolvido pelo Lucide (data-lucide) via createIcons em main.js.
+         z-50: fica acima do header (z-40). target="_blank" + rel seguro
+         porque é um link externo. -->
+    <a
+      data-whatsapp
+      href="#"
+      aria-label="Conversar comigo no WhatsApp"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="whatsapp-float fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white transition-transform duration-300 hover:scale-110 focus-visible:scale-110 sm:bottom-6 sm:right-6"
+    >
+      <img src="/icons/whatsapp.svg" class="h-7 w-7" alt="" aria-hidden="true" />
+    </a>
+
+    <!-- ======================= MODAL LIGHTBOX (SCREENSHOTS) =======================
+         Visualização ampliada e acessível de screenshots dos projetos.
+         Controlado por src/js/lightbox.js. -->
+    <dialog
+      id="lightbox-dialog"
+      data-lightbox
+      aria-labelledby="lightbox-titulo"
+      class="fixed inset-0 z-50 m-0 hidden h-full w-full max-h-none max-w-none items-center justify-center bg-background/85 p-4 backdrop-blur-md transition-opacity duration-300"
+    >
+      <div class="relative flex max-h-[90vh] max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-glow">
+        <!-- Barra de controle superior -->
+        <div class="flex items-center justify-between border-b border-border bg-surface-2/80 px-5 py-3.5">
+          <h3 id="lightbox-titulo" data-lightbox-title class="font-display text-base font-semibold text-foreground truncate pr-4">
+            Visualização do projeto
+          </h3>
+          <button
+            type="button"
+            data-lightbox-close
+            aria-label="Fechar visualização ampliada (Escape)"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-muted transition-colors hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary cursor-pointer"
+          >
+            <i data-lucide="x" class="h-5 w-5" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <!-- Imagem ampliada -->
+        <div class="relative flex items-center justify-center overflow-auto p-2 sm:p-4 bg-background/50">
+          <img
+            data-lightbox-img
+            src=""
+            alt=""
+            class="max-h-[72vh] w-auto max-w-full rounded-lg object-contain shadow-card"
+          />
+        </div>
+      </div>
+    </dialog>
 
     <script type="module" src="/src/js/main.js"></script>
   </body>

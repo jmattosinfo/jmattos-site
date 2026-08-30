@@ -29,19 +29,31 @@ function escapeHTML(texto) {
 
 // ---------- Blocos menores do card ----------
 
-// Screenshot: imagem real OU placeholder identificável enquanto
-// não houver captura de tela. O overlay de hover só aparece quando
-// existe link de demonstração.
+// Screenshot: imagem real com zoom acessível via Lightbox OU placeholder identificável
 function blocoScreenshot(projeto) {
   const numero = escapeHTML(projeto.id);
   const temImagem = Boolean(projeto.screenshot);
 
   const midia = temImagem
-    ? `<img
-         src="${escapeHTML(projeto.screenshot)}"
-         alt="Screenshot do projeto ${escapeHTML(projeto.titulo)}"
-         class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-       />`
+    ? `<button
+         type="button"
+         data-abrir-lightbox
+         data-lightbox-src="${escapeHTML(projeto.screenshot)}"
+         data-lightbox-alt="Screenshot ampliada do projeto ${escapeHTML(projeto.titulo)}"
+         data-lightbox-title="${escapeHTML(projeto.titulo)}"
+         class="group/zoom relative block h-full w-full cursor-zoom-in text-left focus-visible:outline-2 focus-visible:outline-primary"
+         aria-label="Ampliar screenshot do projeto ${escapeHTML(projeto.titulo)}"
+       >
+         <img
+           src="${escapeHTML(projeto.screenshot)}"
+           alt="Screenshot do projeto ${escapeHTML(projeto.titulo)}"
+           class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+         />
+         <span class="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-md bg-background/80 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm opacity-0 transition-opacity duration-200 group-hover/zoom:opacity-100 group-focus-visible/zoom:opacity-100">
+           <i data-lucide="zoom-in" class="h-3.5 w-3.5 text-primary-light" aria-hidden="true"></i>
+           Ampliar
+         </span>
+       </button>`
     : `<div
          class="flex h-full w-full flex-col items-center justify-center gap-2 bg-grid"
          aria-label="Screenshot ainda não disponível"
@@ -52,26 +64,9 @@ function blocoScreenshot(projeto) {
          </span>
        </div>`;
 
-  // Overlay que aparece no hover (apenas se houver demonstração para abrir)
-  const overlay = projeto.linkDemo
-    ? `<a
-         href="${escapeHTML(projeto.linkDemo)}"
-         target="_blank"
-         rel="noopener noreferrer"
-         class="absolute inset-0 flex items-center justify-center gap-2 bg-background/60 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100"
-         aria-label="Abrir demonstração de ${escapeHTML(projeto.titulo)}"
-       >
-         <span class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-foreground">
-           <i data-lucide="external-link" class="h-4 w-4" aria-hidden="true"></i>
-           Ver demonstração
-         </span>
-       </a>`
-    : "";
-
   return `
     <div class="relative aspect-video overflow-hidden border-b border-border bg-surface-2">
       ${midia}
-      ${overlay}
     </div>`;
 }
 

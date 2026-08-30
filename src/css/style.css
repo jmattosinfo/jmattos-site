@@ -33,6 +33,10 @@
   --color-foreground: #f8fafc;
   --color-muted: #94a3b8;
 
+  /* Cores de estado (formulário de contato): sucesso e erro */
+  --color-success: #22c55e;
+  --color-danger: #f87171;
+
   /* Cor padrão de bordas (branco bem translúcido) */
   --color-border: rgb(248 250 252 / 0.08);
 
@@ -90,6 +94,41 @@
 
   -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 35%, black 35%, transparent 100%);
   mask-image: radial-gradient(ellipse 75% 60% at 50% 35%, black 35%, transparent 100%);
+}
+
+/* Estado de erro nos campos do formulário de contato (validação inline).
+   Fica FORA de @layer, então vence a classe utilitária border-border do
+   Tailwind (no v4, estilos sem layer têm prioridade sobre os com layer). */
+.input-erro {
+  border-color: var(--color-danger);
+}
+
+/* Destaque do card de caminho escolhido no hub #caminhos (aplicado via JS
+   ao clicar nos CTAs do Hero). Fora de @layer (como .input-erro) para vencer
+   as classes utilitárias do Tailwind. Glow azul discreto — padrão shadow-glow. */
+.caminho-destaque {
+  border-color: rgb(37 99 235 / 0.6);
+  box-shadow: 0 0 32px -12px rgb(37 99 235 / 0.45);
+}
+
+/* Link ativo da navegação (Scrollspy). Destaca o texto e adiciona peso font-medium */
+.nav-link-ativo {
+  color: var(--color-foreground) !important;
+  font-weight: 600;
+}
+
+/* Animação suave de entrada do Lightbox */
+dialog[data-lightbox] {
+  animation: lightbox-fade-in 0.22s ease-out forwards;
+}
+
+@keyframes lightbox-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ============================================================
@@ -165,13 +204,41 @@
     transition:
       opacity 0.55s ease-out,
       transform 0.55s ease-out;
-    transition-delay: var(--reveal-delay, 0ms);
+    transition-delay: var(--reveal-delay, 5ms);
   }
 
   [data-reveal].is-revealed {
     opacity: 1;
     transform: none;
   }
+
+  [data-reveal="right"] {
+    transform: translateX(50px);
+  }
+  [data-reveal="left"] {
+    transform: translateX(-50px);
+  }
+
+  /* Variante "forte" para textos/cabeçalhos (classe reveal-forte):
+     entrada bem mais notável — maior deslocamento + encolhimento + blur.
+     Aplica-se APENAS a elementos que tenham data-reveal E a classe
+     reveal-forte (usada nos cabeçalhos de seção do index.html).
+     A especificidade (0,2,0) vence a base [data-reveal] (0,1,0), então
+     sobrescreve sem afetar os demais reveals (direcionais, cards, itens). */
+  [data-reveal].reveal-forte {
+    transform: translateY(56px) scale(0.94);
+    filter: blur(8px);
+    transition:
+      opacity 0.32s ease-out,
+      transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.32s ease-out;
+  }
+
+  [data-reveal].reveal-forte.is-revealed {
+    transform: none;
+    filter: blur(0);
+  }
+
 }
 
 /* Respeita prefers-reduced-motion: colapsa qualquer transição/
@@ -182,18 +249,45 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0.05ms !important;
     scroll-behavior: auto !important;
   }
 
   [data-reveal] {
     opacity: 1;
     transform: none;
+    filter: none; /* garante que o blur do reveal-forte nunca fique preso */
   }
 }
 
 /* ============================================================
-   5) EXEMPLOS DE USO (classes geradas pelos tokens)
+   5) BOTÃO FLUTUANTE — WHATSAPP
+   ------------------------------------------------------------
+   Halo de pulso discreto (animação na sombra) que chama atenção
+   para o botão fixo no canto inferior esquerdo. Aplica-se apenas
+   à classe .whatsapp-float e APENAS quando o usuário NÃO pediu
+   redução de movimento (prefers-reduced-motion).
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .whatsapp-float {
+    animation: whatsapp-pulse 2.4s ease-out infinite;
+  }
+
+  @keyframes whatsapp-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(37 211 102 / 0.45);
+    }
+    70% {
+      box-shadow: 0 0 0 14px rgb(37 211 102 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(37 211 102 / 0);
+    }
+  }
+}
+
+/* ============================================================
+   6) EXEMPLOS DE USO (classes geradas pelos tokens)
    ------------------------------------------------------------
    <section class="container-main py-section">              → container + espaço
    <div class="rounded-xl border border-border bg-surface p-6 shadow-card">

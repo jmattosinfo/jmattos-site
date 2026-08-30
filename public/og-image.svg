@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Gradiente de fundo escuro -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05070d"/>
+      <stop offset="50%" stop-color="#0a1020"/>
+      <stop offset="100%" stop-color="#05070d"/>
+    </linearGradient>
+
+    <!-- Glow azul principal -->
+    <radialGradient id="glow" cx="80%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.3"/>
+      <stop offset="60%" stop-color="#2563eb" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Padrão de grid sutil -->
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#f8fafc" stroke-width="1" stroke-opacity="0.04"/>
+    </pattern>
+
+    <!-- Gradiente para moldura do card -->
+    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fundo base -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Moldura decorativa do card -->
+  <rect x="40" y="40" width="1120" height="550" rx="24" fill="#0a1020" fill-opacity="0.75" stroke="url(#border-grad)" stroke-width="1.5"/>
+
+  <!-- Terminal decorativo no canto direito superior -->
+  <g transform="translate(730, 110)">
+    <rect width="380" height="230" rx="12" fill="#101a30" stroke="#f8fafc" stroke-opacity="0.1" stroke-width="1"/>
+    <!-- Círculos do terminal -->
+    <circle cx="24" cy="20" r="5" fill="#f87171" fill-opacity="0.8"/>
+    <circle cx="40" cy="20" r="5" fill="#eab308" fill-opacity="0.8"/>
+    <circle cx="56" cy="20" r="5" fill="#22c55e" fill-opacity="0.8"/>
+    <line x1="0" y1="40" x2="380" y2="40" stroke="#f8fafc" stroke-opacity="0.08" stroke-width="1"/>
+
+    <!-- Código do terminal -->
+    <text x="24" y="75" font-family="monospace" font-size="14" fill="#38bdf8">const dev = {</text>
+    <text x="44" y="105" font-family="monospace" font-size="14" fill="#f8fafc">  name: <tspan fill="#eab308">'Julio Mattos'</tspan>,</text>
+    <text x="44" y="135" font-family="monospace" font-size="14" fill="#f8fafc">  role: <tspan fill="#38bdf8">'Full Stack &amp; RPA'</tspan>,</text>
+    <text x="44" y="165" font-family="monospace" font-size="14" fill="#f8fafc">  stack: [<tspan fill="#22c55e">'Python'</tspan>, <tspan fill="#22c55e">'React'</tspan>, <tspan fill="#22c55e">'Node'</tspan>]</text>
+    <text x="24" y="195" font-family="monospace" font-size="14" fill="#38bdf8">};</text>
+  </g>
+
+  <!-- Tag superior com micro-acento -->
+  <g transform="translate(100, 120)">
+    <circle cx="6" cy="6" r="4" fill="#eab308"/>
+    <text x="22" y="10" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="600" fill="#94a3b8" letter-spacing="3">JMATTOS.DEV</text>
+  </g>
+
+  <!-- Nome / Título Principal -->
+  <text x="100" y="220" font-family="'Space Grotesk', system-ui, sans-serif" font-size="64" font-weight="700" fill="#f8fafc" letter-spacing="-1">
+    Julio Mattos
+  </text>
+
+  <!-- Subtítulo / Especialidade -->
+  <text x="100" y="275" font-family="'Space Grotesk', system-ui, sans-serif" font-size="28" font-weight="500" fill="#38bdf8">
+    Full Stack Developer &amp; Automação de Processos
+  </text>
+
+  <!-- Descrição -->
+  <text x="100" y="340" font-family="'Inter', system-ui, sans-serif" font-size="20" fill="#94a3b8">
+    Aplicações web modernas, APIs robustas e automações inteligentes.
+  </text>
+  <text x="100" y="372" font-family="'Inter', system-ui, sans-serif" font-size="20" fill="#94a3b8">
+    Aberto a oportunidades de emprego e projetos sob medida.
+  </text>
+
+  <!-- Badges de Stack / Habilidades -->
+  <g transform="translate(100, 440)">
+    <!-- Badge 1: Python/Django -->
+    <rect x="0" y="0" width="160" height="42" rx="8" fill="#101a30" stroke="#2563eb" stroke-opacity="0.4"/>
+    <text x="80" y="26" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="15" fill="#f8fafc">Python • Django</text>
+
+    <!-- Badge 2: React & Node -->
+    <rect x="175" y="0" width="160" height="42" rx="8" fill="#101a30" stroke="#38bdf8" stroke-opacity="0.4"/>
+    <text x="255" y="26" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="15" fill="#f8fafc">React • Node.js</text>
+
+    <!-- Badge 3: RPA / Automação -->
+    <rect x="350" y="0" width="150" height="42" rx="8" fill="#101a30" stroke="#eab308" stroke-opacity="0.4"/>
+    <text x="425" y="26" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="15" fill="#f8fafc">RPA • Automação</text>
+
+    <!-- Badge 4: Linux & VPS -->
+    <rect x="515" y="0" width="140" height="42" rx="8" fill="#101a30" stroke="#22c55e" stroke-opacity="0.4"/>
+    <text x="585" y="26" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="15" fill="#f8fafc">Linux • VPS</text>
+  </g>
+
+  <!-- Rodapé do Card com URL -->
+  <g transform="translate(100, 535)">
+    <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="600" fill="#38bdf8">jmattosdev.tech</text>
+  </g>
+</svg>
+

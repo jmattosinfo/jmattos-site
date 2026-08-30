@@ -27,6 +27,8 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
+ecosystem.config.js
+ecosystem.config.cjs
 
 # ============================================================
 # DOCUMENTAÇÃO LOCAL / PESSOAL
@@ -38,9 +40,11 @@ workflow.md
 # ============================================================
 .vite/
 .cache/
+.npm/
 coverage/
 *.tsbuildinfo
 .eslintcache
+.node_repl_history
 
 # ============================================================
 # SISTEMAS OPERACIONAIS

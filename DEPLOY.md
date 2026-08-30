@@ -16,6 +16,8 @@ Código local (src/) → npm run build → dist/ → SFTP (upload automático ao
 
 > **Hot-reload no servidor:** o projeto usa Vite. Rodando `npm run build -- --watch` + `uploadOnSave`/watcher do SFTP, **cada alteração salva no código local é enviada automaticamente para o web root do site no CloudPanel** e o `server.js` (Express) passa a servir a nova versão imediatamente — basta atualizar a página no navegador com F5.
 
+> **API de contato:** além de servir o `dist/`, o [`server.js`](server.js) expõe `POST /api/contato` (formulário da seção Contato). A rota valida os dados e **envia o e-mail real** via SMTP (Nodemailer + Gmail App Password) para o e-mail do dono — sem depender do app de e-mail do visitante. As credenciais são variáveis de ambiente (`SMTP_USER`, `SMTP_PASS`, `SMTP_TO`) configuradas no CloudPanel/PM2 (ver seção 8). Como toda mudança no `server.js`, alterações na rota exigem **reiniciar o processo Node** (ver seção 7).
+
 ---
 
 ## 1. Pré-requisitos
@@ -286,7 +288,53 @@ sudo env PATH=$PATH:/home/jmattosdev/.nvm/versions/node/v22.23.2/bin /usr/lib/no
 
 ---
 
-## 8. Solução de problemas (troubleshooting)
+## 8. Configurar o envio de e-mail do formulário (Gmail SMTP)
+
+O formulário da seção Contato envia para `POST /api/contato`, que agora **entrega o e-mail de verdade** via **Gmail SMTP** usando o `nodemailer` — sem depender do app de e-mail do visitante.
+
+### 8.1. Pré-requisito: criar a App Password no Google
+
+O Gmail **não aceita a senha normal** da conta para envio por SMTP. É preciso uma **senha de aplicativo (App Password)**, que exige a **verificação em 2 etapas (2FA)** ativada:
+
+1. Ative a verificação em 2 etapas: `myaccount.google.com` → **Segurança** → **Verificação em 2 etapas**.
+2. Gere a senha de app: `myaccount.google.com` → **Segurança** → **Senhas de app** (ou direto em `https://myaccount.google.com/apppasswords`).
+3. Crie uma senha de app (ex.: nome `jmattosdev`), copie o código gerado (16 caracteres, ex.: `xxxx xxxx xxxx xxxx`) — é ela que vai em `SMTP_PASS`.
+
+### 8.2. Configurar as variáveis de ambiente no servidor
+
+As credenciais **nunca** ficam no código/Git. Configure no ambiente do processo Node:
+
+- `SMTP_USER` — a conta Gmail remetente (ex.: `jmattosinfo@gmail.com`).
+- `SMTP_PASS` — a **App Password** gerada acima (com ou sem espaços, ambos funcionam).
+- `SMTP_TO` — destinatário das mensagens (**opcional**; se ausente, usa o próprio `SMTP_USER` — envio Gmail → Gmail, o cenário mais confiável).
+
+Como definir (depende de como o processo Node roda):
+
+- **Gerenciado pelo CloudPanel:** na página do site, procure a seção de variáveis de ambiente do runtime NodeJS, adicione as variáveis e **reinicie o processo** (botão **Restart**).
+- **Via PM2 manual:** defina as variáveis ao reiniciar:
+  ```bash
+  cd /home/<site>/htdocs/<dominio>
+  SMTP_USER="jmattosinfo@gmail.com" SMTP_PASS="xxxx xxxx xxxx xxxx" pm2 restart jmattosdev --update-env
+  ```
+- **Via ecosystem do PM2** (recomendado para persistir): crie um `ecosystem.config.cjs` na raiz (**use a extensão `.cjs` — o projeto tem `"type": "module"` no `package.json`; um `.js` CommonJS não é carregado pelo PM2 e falha com "No script path"**) com o bloco `env` contendo as variáveis e inicie com `pm2 start ecosystem.config.cjs --update-env`.
+
+### 8.3. Reiniciar o processo e testar
+
+1. Como o `server.js` lê as variáveis na inicialização, **reinicie o processo Node** após configurar (ver seção 7).
+2. Submeta o formulário em `https://jmattosdev.tech`, ou teste direto:
+   ```bash
+   curl -X POST https://jmattosdev.tech/api/contato \
+     -H 'Content-Type: application/json' \
+     -d '{"nome":"Teste","email":"t@t.com","tipo":"site","assunto":"Contato pelo portfólio — Site","mensagem":"Mensagem de teste com mais de 10 caracteres"}'
+   ```
+3. Confirme a chegada no Gmail (a mensagem também é registrada no log do Node: `[CONTATO] E-mail enviado para ...`).
+4. Verifique os casos de erro no log: sem credenciais → `[CONTATO] SMTP não configurado...`; falha de autenticação → `[CONTATO] Falha ao enviar e-mail: ...`.
+
+> **Proteções incluídas:** rate limit (10 envios / 15 min por IP) e honeypot (campo oculto que descarta envios de bots silenciosamente) — tudo em [`server.js`](server.js) e [`src/js/contato.js`](src/js/contato.js).
+
+---
+
+## 9. Solução de problemas (troubleshooting)
 
 Verificações rápidas na ordem:
 
@@ -320,7 +368,7 @@ systemctl status nginx && curl -I http://localhost && ls -la /home/<site>/htdocs
 3. Ajustar o `remotePath` do [`sftp.json`](.vscode/sftp.json:8) para o web root.
 4. Apontar o **DNS** (registro A `@` e `www` → IP da VPS, **proxy OFF**).
 5. Rodar `npm ci && npm run build` e fazer o **upload inicial** (`SFTP: Sync Local -> Remote`) da **raiz do projeto** (contém [`server.js`](server.js), `package.json` e `dist/`); instalar as dependências no servidor com `npm install --omit=dev`.
-6. Garantir que o processo Node está rodando na **porta 3001** (health check: `GET /status` → `OK`).
+6. Garantir que o processo Node está rodando na **porta 3001** (health check: `GET /status` → `OK`; a rota `POST /api/contato` também passa a responder).
 7. Emitir o **SSL** pelo CloudPanel (Let's Encrypt).
 8. Acessar `https://jmattosdev.tech` no navegador.
 9. Para atualizar conteúdo: `npm run build -- --watch` + salvar (upload automático) → F5. Se o `server.js` mudar, reiniciar o processo Node no CloudPanel.

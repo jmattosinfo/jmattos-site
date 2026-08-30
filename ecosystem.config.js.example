@@ -1,0 +1,38 @@
+// Exemplo de configuração do PM2 para o site JMATTOS.DEV (runtime NodeJS).
+// Usado APENAS se o processo Node for gerenciado por PM2 manual (e não pelo
+// botão do CloudPanel). O [`server.js`](server.js) lê SMTP_USER, SMTP_PASS e
+// SMTP_TO destas variáveis de ambiente para enviar o e-mail do formulário.
+//
+// ⚠️ EXTENSÃO `.cjs` (IMPORTANTE):
+//   Este projeto tem `"type": "module"` no package.json. Nesse caso, um
+//   arquivo `ecosystem.config.js` com `module.exports` (CommonJS) NÃO é
+//   carregado pelo PM2 — o Node o interpreta como ES Module e o PM2 falha
+//   com "No script path - aborting". A correção é salvar com a extensão
+//   `.cjs`, que força o CommonJS.
+//
+// COMO USAR:
+//   1. Copie para `ecosystem.config.cjs`:
+//        cp ecosystem.config.cjs.example ecosystem.config.cjs
+//   2. Preencha SMTP_PASS com a App Password do Gmail (ajuste SMTP_USER/SMTP_TO
+//      se o destinatário for diferente do remetente).
+//   3. Inicie/atualize:
+//        pm2 start ecosystem.config.cjs --update-env   # 1ª vez
+//        pm2 restart ecosystem.config.cjs --update-env # atualizar
+//        pm2 save
+//
+// ⚠️ SEGURANÇA: `ecosystem.config.cjs` está no `.gitignore` — NUNCA commite
+//    este arquivo com a senha. As credenciais só existem no servidor.
+module.exports = {
+  apps: [
+    {
+      name: "jmattosdev",
+      script: "server.js",
+      env: {
+        NODE_ENV: "production",
+        SMTP_USER: "jmattosinfo@gmail.com",
+        SMTP_PASS: "COLE_A_SENHA_DE_APP_AQUI",
+        SMTP_TO: "jmattosinfo@gmail.com",
+      },
+    },
+  ],
+};

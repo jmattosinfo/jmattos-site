@@ -37,7 +37,14 @@ function cardServico(servico, indice) {
         <span class="font-mono text-xs text-accent">${numero}</span>
       </div>
       <h3 class="mt-4 text-lg">${escapeHTML(servico.titulo)}</h3>
-      <p class="mt-2 text-sm leading-relaxed text-muted">${escapeHTML(servico.descricao)}</p>
+      <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">${escapeHTML(servico.descricao)}</p>
+      <a
+        href="#contato"
+        class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary-light transition-colors hover:text-foreground"
+      >
+        Orçar este serviço
+        <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+      </a>
     </article>`;
 }
 

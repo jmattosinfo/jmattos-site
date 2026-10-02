@@ -1,377 +1,227 @@
-# DEPLOY — jmattosdev.tech (CloudPanel + NodeJS/Express + SFTP)
+# DEPLOY — jmattosdev.tech (VPS + Docker + Docker Compose)
 
-Guia passo a passo para publicar o JMATTOS.DEV no domínio usando o **CloudPanel** da VPS (site **NodeJS**, servido por um [`server.js`](server.js) com **Express**) e a **extensão SFTP do VSCode**.
+Guia passo a passo para publicar e atualizar o **JMATTOS.DEV** na VPS, executando a aplicação como um **container Docker** orquestrado pelo **Docker Compose**.
+
+Este documento descreve o fluxo **manual e seguro (Nível 1 de DevOps)**: desenvolvimento local → `git push` → `git pull` na VPS → rebuild do container. Não há deploy automático nem upload de ficheiros por FTP/SFTP.
 
 **Arquitetura:**
 
 ```
-Usuário → DNS (jmattosdev.tech → IP da VPS) → CloudPanel (Nginx) → proxy → NodeJS/Express (porta 3001) → dist/
+Visitante → DNS (jmattosdev.tech → IP da VPS) → Proxy reverso (Nginx) → Container Docker → Node/Express (porta 3001) → dist/
 ```
 
 **Fluxo de trabalho:**
 
 ```
-Código local (src/) → npm run build → dist/ → SFTP (upload automático ao salvar) → VPS (web root do site no CloudPanel) → server.js (Express) serve dist/ → Nginx faz proxy para o Node
+Código local → validação no Docker (dev) → git push → VPS → git pull → docker compose up -d --build → container serve dist/ + POST /api/contato
 ```
 
-> **Hot-reload no servidor:** o projeto usa Vite. Rodando `npm run build -- --watch` + `uploadOnSave`/watcher do SFTP, **cada alteração salva no código local é enviada automaticamente para o web root do site no CloudPanel** e o `server.js` (Express) passa a servir a nova versão imediatamente — basta atualizar a página no navegador com F5.
+> **Container único:** toda a aplicação (build do Vite + [`server.js`](server.js) com Express) roda num só container definido no [`docker-compose.yml`](docker-compose.yml:1). O proxy reverso de borda (Nginx) apenas encaminha o tráfego do domínio para a porta `3001`, onde o container escuta.
 
-> **API de contato:** além de servir o `dist/`, o [`server.js`](server.js) expõe `POST /api/contato` (formulário da seção Contato). A rota valida os dados e **envia o e-mail real** via SMTP (Nodemailer + Gmail App Password) para o e-mail do dono — sem depender do app de e-mail do visitante. As credenciais são variáveis de ambiente (`SMTP_USER`, `SMTP_PASS`, `SMTP_TO`) configuradas no CloudPanel/PM2 (ver seção 8). Como toda mudança no `server.js`, alterações na rota exigem **reiniciar o processo Node** (ver seção 7).
+> **API de contato:** além de servir o `dist/`, o [`server.js`](server.js) expõe `POST /api/contato` (formulário da seção Contato). A rota valida os dados e **envia o e-mail real** via SMTP (Nodemailer + Gmail App Password). As credenciais são variáveis de ambiente (`SMTP_USER`, `SMTP_PASS`, `SMTP_TO`) injetadas no container pelo `env_file: .env` (ver seção 3).
 
 ---
 
 ## 1. Pré-requisitos
 
-Antes de começar, confirme que você tem:
+Antes de começar, confirme que tem:
 
-- **VPS (Ubuntu/Debian)** com **CloudPanel** instalado e funcionando. A VPS atual usa **CloudPanel v6** (acesso via CLI `clpctl`).
-- **Acesso ao painel do CloudPanel** — a UI fica em `https://IP-DA-VPS:8443` (ex.: `https://187.127.39.48:8443`).
-- **Extensão SFTP instalada no VSCode** — *SFTP* de **Natizyskunk** (ID: `Natizyskunk.sftp`). É ela que gerencia o upload automático.
-- **Acesso SFTP/SSH à VPS** com o **usuário do site** **`jmattosdev`** (host: `187.127.39.48`), autenticando por **chave SSH** (recomendado) ou senha.
-- **Domínio próprio** já registrado (ex.: `jmattosdev.tech`) e com **registro A no DNS apontando para o IP da VPS** (sem proxy — ver seção 6).
-- **Projeto versionado no GitHub** (branch `main`) — o repositório é a fonte de verdade do código; o deploy apenas publica o build.
-- **Node.js + npm** instalados localmente (para gerar o build com `npm run build`).
-
----
-
-## 2. Entendendo a estrutura de sites do CloudPanel
-
-O CloudPanel **gerencia os vhosts do Nginx automaticamente**. Você **não edita** `/etc/nginx/` na mão — tudo é feito pelo painel (ou via `sudo clpctl`).
-
-Para **cada site**, o CloudPanel cria um **usuário de sistema dedicado** com a seguinte estrutura (exemplo do site existente `acolher.life`):
-
-```
-/home/<usuario-do-site>/
-├── htdocs/
-│   └── <dominio>/      # ← WEB ROOT (pasta com o app NodeJS + dist/)
-├── logs/
-│   └── nginx/          # logs de acesso/erro do site
-├── backups/
-└── tmp/
-```
-
-- **Web root padrão:** `/home/<usuario>/htdocs/<dominio>/` — é **aqui** que ficam o [`server.js`](server.js), o `package.json` e o `dist/`.
-- **Usuário do site:** criado pelo painel ao registrar o site (ex.: `jmattosdev.tech` → `/home/jmattosdev.tech`).
-- **Logs do site:** em `/home/<usuario>/logs/nginx/` (muito útil para troubleshooting).
-
-> ⚠️ **Importante:** o site **não pode** ser publicado numa pasta fora da estrutura do CloudPanel (ex.: `/home/deploy/jmattosdev.tech`). O Nginx do CloudPanel faz proxy para o processo NodeJS dentro do **web root do site** (`/home/<site>/htdocs/<dominio>/`).
+- **VPS (Linux/Ubuntu)** com acesso **SSH**.
+- **Docker Engine** e **Docker Compose v2** instalados e a funcionar (`docker --version` e `docker compose version`).
+- **Usuário do site** na VPS: `jmattosdev` (dono do diretório do projeto e dos ficheiros). O deploy é executado em seu nome.
+- **Domínio próprio** (`jmattosdev.tech`) com **registro A no DNS apontando para o IP da VPS**.
+- **Proxy reverso (Nginx)** configurado para encaminhar o domínio para `127.0.0.1:3001` (a porta do container), com TLS/HTTPS ativo.
+- **Projeto versionado no GitHub** (branch `main`) — o repositório é a **fonte de verdade** do código.
+- **Docker e Docker Compose v2** também na máquina local (para o desenvolvimento e testes).
 
 ---
 
-## 3. Configuração do SFTP no VSCode
+## 2. Estrutura na VPS
 
-### 3.1. Criar o arquivo `sftp.json`
+O projeto fica no diretório:
 
-Com o projeto aberto no VSCode, abra a paleta de comandos (`Ctrl+Shift+P`) e execute **`SFTP: Config`**. Isso cria o arquivo [`.vscode/sftp.json`](.vscode/sftp.json) na raiz do projeto.
-
-### 3.2. Conteúdo recomendado
-
-> **Antes de definir o `remotePath`:** crie o site no CloudPanel (seção 4) e anote o caminho do web root que aparece no painel. Neste projeto é `/home/jmattosdev/htdocs/jmattosdev.tech/` (usuário do site `jmattosdev` — o nome exato pode variar conforme o registro no painel).
-
-```json
-{
-    "name": "jmattosdev-cloudpanel",
-    "host": "187.127.39.48",
-    "protocol": "sftp",
-    "port": 22,
-    "username": "jmattosdev",
-    "privateKeyPath": "/home/jmattos/.ssh/id_ed25519",
-    "remotePath": "/home/jmattosdev/htdocs/jmattosdev.tech",
-    "uploadOnSave": true,
-    "ignore": [
-        "**/.git/**",
-        "**/.vscode/**",
-        "**/node_modules/**",
-        "**/*.map",
-        "**/.gitignore",
-        "**/README.md",
-        "**/DEPLOY.md",
-        "**/AI_GUIDELINES.md",
-        "**/src/**",
-        "**/public/**",
-        "/index.html",
-        "/vite.config.js"
-    ],
-    "watcher": {
-        "files": "dist/**/*",
-        "autoUpload": true,
-        "autoDelete": false
-    }
-}
+```
+/home/jmattosdev/htdocs/jmattosdev.tech/
+├── docker-compose.yml      # Orquestração de produção (build + container)
+├── Dockerfile              # Build multi-stage da imagem
+├── .env                    # Credenciais reais (NÃO versionado; permissão 600)
+├── server.js               # Express: serve dist/ + POST /api/contato
+├── package.json
+├── src/ · public/ · index.html · vite.config.js
+└── (imagem e container ficam sob gestão do Docker)
 ```
 
-> ⚠️ **Não use `"context": "dist"`.** Como o site é **NodeJS** (o [`server.js`](server.js) serve o `dist/`), o web root precisa conter o [`server.js`](server.js), o `package.json` e a pasta `dist/` **na raiz**. Usar `context` envia apenas o conteúdo de `dist/` "aplanado" no web root — o que quebra o Express (ele procura por `dist/index.html`) e causa **502 Bad Gateway**.
-
-> ⚠️ **`watcher.autoDelete` deve ser `false`.** Com o hot-reload (`npm run build -- --watch`), o Vite apaga/recria o `dist/` a cada salvamento; se `autoDelete: true`, o SFTP apaga os assets no servidor durante o rebuild → **site perde o estilo** (CSS/JS 404). Mantenha `autoDelete: false` e o `watcher.files` restrito a `dist/**/*`.
-
-**Explicação dos campos principais:**
-
-| Campo | Valor | O que faz |
-| --- | --- | --- |
-| `host` | `187.127.39.48` | IP da VPS (ou hostname). |
-| `username` | `jmattosdev` | Usuário do site (dono do web root) usado no SFTP/SSH. |
-| `privateKeyPath` | `/home/jmattos/.ssh/id_ed25519` | Caminho da chave privada SSH. **Alternativa:** use `"password": "SUA_SENHA"` (menos seguro). |
-| `remotePath` | `/home/<site>/htdocs/<dominio>` | **Web root do site no CloudPanel** — o destino do upload (a raiz, não o `dist/`). |
-| `context` | *(removido)* | **Não defina `context`.** A raiz do projeto é enviada por inteiro (com o `dist/` como subpasta) — necessário porque o site é NodeJS e o [`server.js`](server.js) precisa estar no web root. |
-| `uploadOnSave` | `true` | Envia o arquivo para a VPS **toda vez que ele for salvo** (essencial para o hot-reload). |
-| `ignore` | `...` | Exclui pastas/arquivos desnecessários do upload (git, node_modules, docs, maps). |
-| `ignore` | `...` | Exclui pastas que **não devem ir ao servidor**: `src/` e `public/` (o Vite já copia `public/` para o `dist/` no build) e os docs. |
-| `watcher.files` | `dist/**/*` | Observa **apenas** o `dist/` — é ele que o Express serve. Evita enviar/alterar arquivos de `src/`, `index.html` etc. |
-| `watcher.autoDelete` | `false` | **NUNCA use `true`** junto com `npm run build -- --watch`: o Vite apaga e recria o `dist/` a cada build e o SFTP interpreta como remoção, **deletando o `assets/` (CSS/JS) do servidor** — o site fica sem estilo. |
-
-### 3.3. Primeiro upload (envio inicial)
-
-Após configurar o arquivo, faça o upload inicial da **raiz do projeto** (que inclui o `dist/`):
-
-1. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** (ou `SFTP: Upload Folder`).
-2. Aguarde a barra de progresso no canto inferior direito.
-3. Instale as dependências de produção no servidor (se ainda não houver `node_modules/`):
-   ```bash
-   ssh jmattosdev@187.127.39.48
-   cd /home/<site>/htdocs/<dominio>
-   npm install --omit=dev
-   ```
-4. Confirme a estrutura no servidor:
-   ```bash
-   ls -la /home/<site>/htdocs/<dominio>        # deve listar server.js, package.json, node_modules/ e dist/
-   ls -la /home/<site>/htdocs/<dominio>/dist   # deve listar index.html e a pasta assets/
-   ```
+- O **código** é mantido via `git` (ver seção 4).
+- O **`.env`** vive apenas na VPS (nunca no Git), com permissões restritas.
+- A **imagem** é construída localmente na VPS pelo `docker compose up -d --build` (não depende de um registry externo).
 
 ---
 
-## 4. Criar o site no CloudPanel (runtime NodeJS)
+## 3. Configuração do `.env` em produção
 
-O site `jmattosdev.tech` **precisa existir no CloudPanel** antes do upload. Faça pelo painel:
+As credenciais **nunca** ficam no código nem no Git. O container recebe-as via `env_file: .env`.
 
-1. Acesse **`https://187.127.39.48:8443`** no navegador (aceite o aviso de certificado auto-assinado na primeira vez).
-2. Faça login com o usuário/senha **administrador do CloudPanel**.
-3. Vá em **Websites → Add Website** (Adicionar site).
-4. Informe o **domínio principal**: `jmattosdev.tech`.
-5. Adicione o domínio adicional **`www.jmattosdev.tech`** (alias), se desejar.
-6. Em **Runtime**, escolha **NodeJS** (o site é servido pelo [`server.js`](server.js) com Express).
-7. Confirme. O CloudPanel vai criar:
-   - O **usuário do site** (ex.: `jmattosdev.tech` ou nome similar).
-   - O **web root** em `/home/<usuario>/htdocs/jmattosdev.tech/`.
-   - O **vhost do Nginx** com proxy para a porta do Node (por padrão, o CloudPanel usa a **porta 3000**; como a 3000 já é usada pelo `acolher.life`, o site deve ser configurado para a **porta 3001**).
+### 3.1. Criar o `.env` a partir do modelo
 
-> **Anote o web root exato** que aparece no painel (seção do site → "Document Root") — é esse caminho que vai no `remotePath` do [`sftp.json`](.vscode/sftp.json:8).
-
-### Alternativa via CLI (requer `sudo`)
-
-Na VPS, o CloudPanel pode criar o site pela linha de comando:
+No diretório do projeto na VPS:
 
 ```bash
-sudo clpctl site:add --domainName=jmattosdev.tech --siteUser=jmattosdev.tech --siteUserPassword='SENHA'
+cp .env.example .env
+chmod 600 .env          # restringe a leitura ao dono
 ```
 
-> Consulte `sudo clpctl` para os comandos e parâmetros exatos da sua versão (CloudPanel 6).
+Preencha as variáveis:
 
----
+| Variável    | Descrição                                                                 |
+| ----------- | ------------------------------------------------------------------------- |
+| `NODE_ENV`  | `production`.                                                             |
+| `PORT`      | `3001` (porta que o container expõe e o proxy encaminha).                 |
+| `SMTP_USER` | Conta Gmail remetente (ex.: `jmattosinfo@gmail.com`).                      |
+| `SMTP_PASS` | **App Password** do Gmail (ver 3.2 — não é a senha normal da conta).       |
+| `SMTP_TO`   | Destinatário das mensagens (opcional — se ausente, usa o próprio `SMTP_USER`). |
+| `IMAGE_TAG` | Tag da imagem (reservado para uso futuro/CI; o Compose atual faz `build`). |
 
-## 5. Publicação no domínio — DNS
-
-### 5.1. Apontar o DNS para a VPS (sem proxy)
-
-O domínio precisa resolver **direto** para o IP da VPS. No painel do seu provedor de domínio (Hostinger), ajuste os registros **desativando o proxy** (o toggle/globo azul dos registros DNS):
-
-| Tipo | Nome/Host | Valor | Proxy |
-| --- | --- | --- | --- |
-| A | `@` (ou `jmattosdev.tech`) | **187.127.39.48** | **OFF** |
-| A | `www` | **187.127.39.48** | **OFF** |
-
-> Se houver um CNAME de `www` com proxy, remova-o e use um registro **A** direto, **sem proxy**. O proxy da Hostinger (`2.57.91.91`) **intercepta o desafio ACME do Let's Encrypt** e faz o Certbot falhar com erro `500`.
-
-### 5.2. Validar o DNS
-
-Confirme que o domínio resolve para a VPS:
-
-```bash
-dig jmattosdev.tech +short
-dig www.jmattosdev.tech +short
-# Esperado: 187.127.39.48 (o IP da VPS)
-```
-
-> A propagação pode levar de minutos a algumas horas.
-
-### 5.3. Testar localmente na VPS (antes do navegador)
-
-```bash
-# Dentro da VPS: deve retornar o HTML do seu site
-curl -I http://localhost
-# Esperado: HTTP/1.1 200 OK
-```
-
----
-
-## 6. Emitir o certificado SSL (HTTPS) no CloudPanel
-
-O CloudPanel tem o **Let's Encrypt integrado** — não use o `certbot` manual. Pelo painel:
-
-1. Acesse o site `jmattosdev.tech` em **Websites**.
-2. Vá na aba **SSL/TLS**.
-3. Clique em **Add / Issue Let's Encrypt Certificate**.
-4. Marque `jmattosdev.tech` e `www.jmattosdev.tech`.
-5. Confirme e aguarde a emissão (requer o DNS já apontando para a VPS — seção 5).
-
-O CloudPanel configura o vhost com HTTPS e o redirect HTTP → HTTPS automaticamente.
-
-> **HSTS (HTTPS forçado no navegador):** o [`server.js`](server.js) envia o header `Strict-Transport-Security: max-age=31536000`. Após a 1ª visita via HTTPS, o navegador passa a usar **somente HTTPS** — eliminando o aviso "Não seguro" mesmo quando o usuário digita `http://` ou usa um favorito antigo. Como o header é enviado pelo Express, **toda alteração no `server.js` exige reiniciar o processo Node** (ver seção 7).
-
-> **Se o Let's Encrypt falhar com `unauthorized ... 500`**, a causa é o DNS ainda apontando para o proxy da Hostinger (`2.57.91.91`). Corrija os registros A (proxy OFF) e aguarde a propagação antes de tentar de novo.
-
----
-
-## 7. Atualizações futuras (deploy automático / hot-reload)
-
-> **Importante para sites NodeJS:** o CloudPanel mantém o processo Node rodando (ex.: via PM2/supervisor). Ao **subir um novo `server.js`** (mudança no código do servidor), é preciso **reiniciar o processo Node** no CloudPanel (botão **Restart** na página do site) ou na VPS. Já para atualizações apenas de conteúdo (`dist/`), **não é preciso reiniciar** — o Express serve os arquivos novos imediatamente.
-
-### 7.1. Deploy automático ao salvar (recomendado)
-
-O objetivo é que **cada alteração local** já vá para o servidor sem esforço manual:
-
-1. **Deixe o build em modo watch rodando** em um terminal (gera o `dist/` atualizado a cada salvamento no `src/`):
-   ```bash
-   npm run build -- --watch
-   ```
-2. **Salve o código no VSCode** — o Vite recompila o `dist/` e a extensão SFTP (via `watcher` + `uploadOnSave`) **envia os arquivos alterados para o web root do site automaticamente**.
-3. **Recarregue a página** no navegador (F5) para ver a mudança publicada.
-
-> Como o [`server.js`](server.js) (Express) serve os arquivos do web root, **não é preciso reiniciar o Nginx nem o Node** em atualizações de conteúdo (HTML/CSS/JS). Basta o upload ter sido feito (lembrando que o `dist/` fica **dentro** da pasta `dist/` no web root, e não aplanado na raiz).
-
-### 7.2. Atualização manual com a extensão SFTP
-
-Se preferir um controle manual:
-
-1. Altere o código e publique no GitHub como de costume:
-   ```bash
-   git add . && git commit -m "descrição da mudança" && git push
-   ```
-2. Gere o build:
-   ```bash
-   npm run build
-   ```
-3. `Ctrl+Shift+P` → **`SFTP: Sync Local -> Remote`** para enviar a raiz do projeto (incluindo o novo `dist/`) ao web root.
-4. Se o [`server.js`](server.js) ou o `package.json` mudaram, **reinstale as dependências** (`npm install --omit=dev` no servidor) e **reinicie o processo Node** no CloudPanel.
-5. Pronto — o site já está atualizado.
-
-### 7.3. Alternativa: `git pull` no servidor
-
-Se preferir versionar o deploy pelo servidor (requer Node.js/npm na VPS):
-
-```bash
-cd /home/<site>/htdocs/<dominio>
-git pull
-npm ci
-npm run build
-# Reinicie o processo Node no CloudPanel (ou via PM2)
-```
-
-> **Atenção:** para o site NodeJS, o web root deve conter o [`server.js`](server.js), o `package.json` e o `dist/` na **raiz** (`/home/<site>/htdocs/<dominio>/`). O `server.js` escuta na porta `process.env.PORT || 3001` (configurada pelo CloudPanel).
-
-> **Dica:** o fluxo 7.1 (SFTP + build em watch) é o que entrega o "hot-reload" contínuo, sem depender de Node.js na VPS.
-
-### 7.4. Persistência do processo Node (sobreviver a reboot da VPS)
-
-Se o [`server.js`](server.js) foi iniciado via **PM2 manualmente** (não pelo botão do CloudPanel), registre o **startup** para que ele suba sozinho após um reboot da VPS:
-
-```bash
-ssh jmattosdev@187.127.39.48
-export NVM_DIR=/home/jmattosdev/.nvm && . "$NVM_DIR/nvm.sh"
-cd /home/<site>/htdocs/<dominio>
-pm2 start server.js --name jmattosdev   # se ainda não estiver rodando
-pm2 save
-# Registrar o boot do PM2 (exige sudo uma única vez):
-sudo env PATH=$PATH:/home/jmattosdev/.nvm/versions/node/v22.23.2/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u jmattosdev --hp /home/jmattosdev
-```
-
-> Se o site foi criado/gerenciado pelo CloudPanel, prefira o botão **Restart** no painel — ele registra o processo da forma oficial, dispensando o `pm2 startup` manual.
-
----
-
-## 8. Configurar o envio de e-mail do formulário (Gmail SMTP)
-
-O formulário da seção Contato envia para `POST /api/contato`, que agora **entrega o e-mail de verdade** via **Gmail SMTP** usando o `nodemailer` — sem depender do app de e-mail do visitante.
-
-### 8.1. Pré-requisito: criar a App Password no Google
+### 3.2. Criar a App Password no Google
 
 O Gmail **não aceita a senha normal** da conta para envio por SMTP. É preciso uma **senha de aplicativo (App Password)**, que exige a **verificação em 2 etapas (2FA)** ativada:
 
 1. Ative a verificação em 2 etapas: `myaccount.google.com` → **Segurança** → **Verificação em 2 etapas**.
 2. Gere a senha de app: `myaccount.google.com` → **Segurança** → **Senhas de app** (ou direto em `https://myaccount.google.com/apppasswords`).
-3. Crie uma senha de app (ex.: nome `jmattosdev`), copie o código gerado (16 caracteres, ex.: `xxxx xxxx xxxx xxxx`) — é ela que vai em `SMTP_PASS`.
-
-### 8.2. Configurar as variáveis de ambiente no servidor
-
-As credenciais **nunca** ficam no código/Git. Configure no ambiente do processo Node:
-
-- `SMTP_USER` — a conta Gmail remetente (ex.: `jmattosinfo@gmail.com`).
-- `SMTP_PASS` — a **App Password** gerada acima (com ou sem espaços, ambos funcionam).
-- `SMTP_TO` — destinatário das mensagens (**opcional**; se ausente, usa o próprio `SMTP_USER` — envio Gmail → Gmail, o cenário mais confiável).
-
-Como definir (depende de como o processo Node roda):
-
-- **Gerenciado pelo CloudPanel:** na página do site, procure a seção de variáveis de ambiente do runtime NodeJS, adicione as variáveis e **reinicie o processo** (botão **Restart**).
-- **Via PM2 manual:** defina as variáveis ao reiniciar:
-  ```bash
-  cd /home/<site>/htdocs/<dominio>
-  SMTP_USER="jmattosinfo@gmail.com" SMTP_PASS="xxxx xxxx xxxx xxxx" pm2 restart jmattosdev --update-env
-  ```
-- **Via ecosystem do PM2** (recomendado para persistir): crie um `ecosystem.config.cjs` na raiz (**use a extensão `.cjs` — o projeto tem `"type": "module"` no `package.json`; um `.js` CommonJS não é carregado pelo PM2 e falha com "No script path"**) com o bloco `env` contendo as variáveis e inicie com `pm2 start ecosystem.config.cjs --update-env`.
-
-### 8.3. Reiniciar o processo e testar
-
-1. Como o `server.js` lê as variáveis na inicialização, **reinicie o processo Node** após configurar (ver seção 7).
-2. Submeta o formulário em `https://jmattosdev.tech`, ou teste direto:
-   ```bash
-   curl -X POST https://jmattosdev.tech/api/contato \
-     -H 'Content-Type: application/json' \
-     -d '{"nome":"Teste","email":"t@t.com","tipo":"site","assunto":"Contato pelo portfólio — Site","mensagem":"Mensagem de teste com mais de 10 caracteres"}'
-   ```
-3. Confirme a chegada no Gmail (a mensagem também é registrada no log do Node: `[CONTATO] E-mail enviado para ...`).
-4. Verifique os casos de erro no log: sem credenciais → `[CONTATO] SMTP não configurado...`; falha de autenticação → `[CONTATO] Falha ao enviar e-mail: ...`.
-
-> **Proteções incluídas:** rate limit (10 envios / 15 min por IP) e honeypot (campo oculto que descarta envios de bots silenciosamente) — tudo em [`server.js`](server.js) e [`src/js/contato.js`](src/js/contato.js).
+3. Crie uma senha de app (ex.: nome `jmattosdev`) e copie o código gerado (16 caracteres) — é esse valor que vai em `SMTP_PASS`.
 
 ---
 
-## 9. Solução de problemas (troubleshooting)
+## 4. Fluxo de deploy manual (Nível 1)
 
-Verificações rápidas na ordem:
+### a) Desenvolvimento e testes local
+
+Trabalhe e valide tudo localmente, com Docker:
+
+```bash
+# Ambiente de desenvolvimento com hot-reload
+docker compose -f docker-compose.dev.yml up -d
+# Frontend: http://localhost:5173/   Backend: http://localhost:3001/
+
+# (Opcional) Testar a imagem de produção localmente
+docker compose up -d --build
+# Aplicação: http://localhost:3001/   Health check: http://localhost:3001/status → OK
+docker compose down
+```
+
+### b) Commit e envio para o GitHub
+
+```bash
+git add .
+git commit -m "descrição da mudança"
+git push
+```
+
+### c) Acesso à VPS via SSH
+
+```bash
+ssh jmattosdev@187.127.39.48
+```
+
+### d) Atualização do código (em nome do usuário do site)
+
+```bash
+cd /home/jmattosdev/htdocs/jmattosdev.tech
+sudo -u jmattosdev git pull
+```
+
+> O `git pull` deve ser executado como o dono do diretório (`jmattosdev`) para evitar conflitos de permissão nos ficheiros.
+
+### e) Reconstrução e arranque do container
+
+```bash
+docker compose up -d --build
+```
+
+O `--build` reconstrói a imagem com o código atualizado do `git pull`. A flag `-d` sobe o container em segundo plano; se já existir, o Compose recria-o com a nova imagem.
+
+---
+
+## 5. Verificação e health check
+
+Após o arranque, confirme que o container está saudável:
+
+```bash
+# 1. Estado dos containers
+docker compose ps
+
+# 2. Health check do Express (dentro do container/servidor)
+curl -I http://127.0.0.1:3001/status        # Esperado: 200 OK
+
+# 3. Teste pelo domínio
+curl -I https://jmattosdev.tech             # Esperado: 200 OK
+
+# 4. Logs em tempo real (opcional)
+docker compose logs -f --tail=200
+```
+
+---
+
+## 6. Atualizações futuras
+
+O fluxo é sempre o mesmo (seção 4). Para atualizar o site depois de uma alteração:
+
+1. Desenvolva e teste localmente (`docker compose -f docker-compose.dev.yml up -d`).
+2. `git add . && git commit -m "..." && git push`.
+3. Na VPS: `cd /home/jmattosdev/htdocs/jmattosdev.tech && sudo -u jmattosdev git pull`.
+4. `docker compose up -d --build`.
+5. Valide com `docker compose ps` e `https://jmattosdev.tech`.
+
+> Alterações apenas no **conteúdo/frontend** também exigem o rebuild (`--build`), porque o build do Vite acontece dentro da imagem (estágio *builder* do [`Dockerfile`](Dockerfile:1)).
+
+---
+
+## 7. Operação do container (runbook)
+
+| Ação                         | Comando                                            |
+| ---------------------------- | -------------------------------------------------- |
+| Subir/reconstruir            | `docker compose up -d --build`                     |
+| Subir sem reconstruir        | `docker compose up -d`                             |
+| Ver estado                   | `docker compose ps`                                |
+| Ver logs (tempo real)        | `docker compose logs -f --tail=200`                |
+| Reiniciar                    | `docker compose restart`                           |
+| Parar e remover o container  | `docker compose down`                              |
+| Listar imagens               | `docker images`                                    |
+| Limpar imagens antigas       | `docker image prune`                               |
+
+> O `restart: always` do [`docker-compose.yml`](docker-compose.yml:1) garante que o container volta a subir automaticamente após um reboot da VPS ou uma falha do processo.
+
+---
+
+## 8. Solução de problemas (troubleshooting)
 
 | Sintoma | Verificação |
 | --- | --- |
-| Site fora do ar | `systemctl status nginx` na VPS — confira se o serviço está `active (running)`. |
-| **`502 Bad Gateway`** | O Nginx faz proxy para o **processo NodeJS que não está rodando**. Verifique: (1) o site está com runtime **NodeJS** no CloudPanel; (2) o web root contém [`server.js`](server.js), `package.json`, `node_modules/` e o `dist/` **na raiz** (não "aplanado"); (3) as dependências estão instaladas (`npm install --omit=dev` no servidor); (4) o processo Node está ativo — `curl http://127.0.0.1:3001/status` deve retornar `OK`; (5) reinicie o processo Node no CloudPanel (botão **Restart**) ou via `pm2 restart jmattosdev`. |
-| Site responde "Empty reply" | O site provavelmente **não foi criado no CloudPanel** ou os arquivos estão fora do web root. Confirme se o site existe em `Websites` e se o `remotePath` do SFTP é o web root (`/home/<site>/htdocs/<dominio>/`). |
-| `403 Forbidden` | Permissões: rode `sudo clpctl system:permissions:reset --directories=770 --files=660 --path=/home/<site>/htdocs/<dominio>` (ou `chown`/`chmod` para o usuário do site). |
-| Página antiga / mudança não aparece | Confirme que o upload foi feito (`ls -la /home/<site>/htdocs/<dominio>`) e force o refresh (`Ctrl+Shift+R`). |
-| Domínio não abre, mas IP abre | DNS não apontou ainda: `dig jmattosdev.tech +short` — se resolver para `2.57.91.91` (proxy Hostinger), corrija os registros A (proxy OFF). |
-| Upload SFTP não acontece | Confira o [`.vscode/sftp.json`](.vscode/sftp.json:1): host, username, `privateKeyPath`/`password`, `remotePath` (web root) e se `uploadOnSave`/`watcher` estão ativos. |
-| Certbot/Let's Encrypt falha `unauthorized` | DNS apontando para o proxy (`2.57.91.91`). Desative o proxy nos registros A e aguarde a propagação. |
-| Nginx não responde na VPS | `curl -I http://localhost` — se retornar o HTML do site, o problema é DNS/firewall; se não, revise o site no CloudPanel e os logs em `/home/<site>/logs/nginx/`. |
-| Portas 80/443 bloqueadas | No Ubuntu, confira o firewall: `sudo ufw status` → `Nginx Full` deve estar `ALLOW`. |
-| Ver logs do site | `tail -f /home/<site>/logs/nginx/error.log` (e `access.log`). |
-| Ver logs do Node | No CloudPanel (site → Logs) ou `pm2 logs` / `journalctl -u <site>` na VPS. |
+| Site fora do ar | `docker compose ps` — confirme que o container está `Up`. Se não estiver, `docker compose up -d --build`. |
+| **`502 Bad Gateway`** | O proxy não alcança a porta `3001`. Verifique: (1) o container está ativo (`docker compose ps`); (2) `curl -I http://127.0.0.1:3001/status` responde `200 OK`; (3) o proxy encaminha para `127.0.0.1:3001`; (4) a porta `3001` do host não está ocupada por outro processo. |
+| Porta `3001` ocupada (`EADDRINUSE`) | Existe outro processo a usar a porta. Identifique-o (`sudo ss -ltnp \| grep 3001`) e pare-o antes de subir o container. |
+| Container a reiniciar em loop | Veja `docker compose logs --tail=200`. Causas comuns: `.env` inválido/ausente ou variáveis SMTP em falta. |
+| Alterações não aparecem no site | Confirme que fez `git pull` na VPS e executou `docker compose up -d --build` (o rebuild é obrigatório). Force o refresh no navegador (`Ctrl+Shift+R`). |
+| E-mail do formulário não chega | Confirme `SMTP_USER`/`SMTP_PASS`/`SMTP_TO` no `.env` (App Password válida) e reinicie: `docker compose up -d --force-recreate`. Veja os logs: `docker compose logs -f`. |
+| Erro de permissão no `git pull` | Execute como o dono do diretório: `sudo -u jmattosdev git pull`. |
+| Build falha | Veja a saída completa do `docker compose up -d --build`. Atente ao primeiro `ERROR` no estágio *builder* (Vite) ou *runtime* (Express). |
+| Ver logs do Express | `docker compose logs -f --tail=200` (o Express escreve em `stdout`/`stderr`). |
 
 **Comando de diagnóstico rápido (roda tudo em sequência):**
 
 ```bash
-systemctl status nginx && curl -I http://localhost && ls -la /home/<site>/htdocs/<dominio> && dig jmattosdev.tech +short
+docker compose ps && curl -I http://127.0.0.1:3001/status && docker compose logs --tail=50
 ```
 
 ---
 
 ## Resumo do fluxo de deploy
 
-1. Criar o site `jmattosdev.tech` no **CloudPanel** (Websites → Add Website, Runtime: **NodeJS**).
-2. Anotar o **web root** do site (ex.: `/home/jmattosdev/htdocs/jmattosdev.tech/`).
-3. Ajustar o `remotePath` do [`sftp.json`](.vscode/sftp.json:8) para o web root.
-4. Apontar o **DNS** (registro A `@` e `www` → IP da VPS, **proxy OFF**).
-5. Rodar `npm ci && npm run build` e fazer o **upload inicial** (`SFTP: Sync Local -> Remote`) da **raiz do projeto** (contém [`server.js`](server.js), `package.json` e `dist/`); instalar as dependências no servidor com `npm install --omit=dev`.
-6. Garantir que o processo Node está rodando na **porta 3001** (health check: `GET /status` → `OK`; a rota `POST /api/contato` também passa a responder).
-7. Emitir o **SSL** pelo CloudPanel (Let's Encrypt).
-8. Acessar `https://jmattosdev.tech` no navegador.
-9. Para atualizar conteúdo: `npm run build -- --watch` + salvar (upload automático) → F5. Se o `server.js` mudar, reiniciar o processo Node no CloudPanel.
+1. Desenvolver e testar localmente com Docker (`docker compose -f docker-compose.dev.yml up -d`).
+2. Publicar no GitHub: `git add . && git commit -m "..." && git push`.
+3. Aceder à VPS por SSH e entrar em `/home/jmattosdev/htdocs/jmattosdev.tech`.
+4. Atualizar o código: `sudo -u jmattosdev git pull`.
+5. Reconstruir e arrancar: `docker compose up -d --build`.
+6. Validar: `docker compose ps` e `https://jmattosdev.tech` (health check: `GET /status` → `OK`).
 
 ---
 

@@ -6,7 +6,7 @@ Portfólio profissional de **Julio Mattos** — Full Stack Developer & Automaç�
 
 ## 📚 Documentação
 
-- [**DEPLOY.md**](DEPLOY.md) — guia completo de deploy no domínio (SFTP + Nginx + deploy automático/hot-reload)
+- [**DEPLOY.md**](DEPLOY.md) — guia de deploy em produção (VPS + Docker + Docker Compose)
 - [**AI_GUIDELINES.md**](AI_GUIDELINES.md) — padrões, regras e orientações para IAs que trabalharem neste projeto
 
 ## 📋 Projeto
@@ -40,86 +40,127 @@ Apresentar a trajetória, a stack e os serviços de forma clara e profissional, 
 | Build     | Vite                                                     |
 | Ícones    | Lucide (via tree-shaking no bundle)                     |
 | Fontes    | Space Grotesk, Inter, JetBrains Mono (Google Fonts)     |
-| Deploy    | CloudPanel / VPS (Nginx + extensão SFTP + deploy automático) |
+| Runtime   | Docker + Docker Compose (Node.js 22 Alpine)             |
+| Deploy    | VPS (Linux/Ubuntu) + Docker Compose (`docker compose up -d --build`) |
 
-> O site usa um **Express** mínimo ([`server.js`](server.js)) apenas para servir o build e receber o formulário de contato (`POST /api/contato` — valida e envia o e-mail real via SMTP com `nodemailer`; credenciais em variáveis de ambiente `SMTP_USER`/`SMTP_PASS`/`SMTP_TO`, ver [DEPLOY.md](DEPLOY.md)). Backend das aplicações em destaque: Python/Django e Node.js/Express (ver `src/js/data/projects.js`).
+> O site roda **100% em container**. A imagem é construída pelo [`Dockerfile`](Dockerfile:1) multi-stage (build do Vite → runtime do Express) e orquestrada pelo [`docker-compose.yml`](docker-compose.yml:1) em produção. O [`server.js`](server.js) serve o build e expõe `POST /api/contato` (valida e envia o e-mail real via SMTP com `nodemailer`; credenciais em variáveis de ambiente `SMTP_USER`/`SMTP_PASS`/`SMTP_TO`, ver [DEPLOY.md](DEPLOY.md)). Backend das aplicações em destaque: Python/Django e Node.js/Express (ver `src/js/data/projects.js`).
 
-## 🚀 Como executar localmente
+## 🚀 Como executar localmente (Docker)
 
-Requisitos: **Node.js 20+** e **npm**.
+Requisitos: **Docker** e **Docker Compose v2** instalados. Não é necessário ter Node.js/npm no sistema — tudo roda dentro do container.
 
 ```bash
-# 1. Instale as dependências
-npm install
+# 1. Crie o seu .env a partir do modelo (contém as credenciais SMTP)
+cp .env.example .env
+#    Abra o .env e preencha SMTP_USER, SMTP_PASS e SMTP_TO.
 
-# 2. Inicie o servidor de desenvolvimento
-npm run dev
+# 2. Suba o ambiente de desenvolvimento (Vite com hot-reload)
+docker compose -f docker-compose.dev.yml up -d
 ```
 
-O projeto estará disponível em **http://localhost:5173/** (com _hot reload_).
+O ambiente de desenvolvimento ficará disponível em:
 
-> **Nota (WSL/Windows):** se `npm run dev` falhar por roteamento ao `CMD.EXE`, execute diretamente:
-> `node node_modules/vite/bin/vite.js`
+- **http://localhost:5173/** — frontend servido pelo Vite com _hot reload_ (qualquer alteração no `src/` é refletida ao guardar).
+- **http://localhost:3001/** — porta reservada para o backend Express (`server.js`).
 
-## 🛠️ Como fazer o build
+> O [`docker-compose.dev.yml`](docker-compose.dev.yml:1) usa a imagem `node:22-alpine`, monta o projeto como volume (`.:/app`) para permitir o hot-reload e executa `npm install && npm run dev`.
+
+Para **parar** o ambiente de desenvolvimento:
 
 ```bash
-# Gera os arquivos otimizados de produção em /dist
-npm run build
+docker compose -f docker-compose.dev.yml down
+```
 
-# Gera o build e recompila automaticamente a cada alteração no código (usado no deploy com hot-reload)
-npm run build -- --watch
+### ⚙️ Configuração do `.env`
 
-# Pré-visualiza o build de produção localmente
-npm run preview
+O ficheiro `.env` **nunca é versionado** (está no `.gitignore`). O modelo [`​.env.example`](.env.example) documenta todas as variáveis necessárias:
+
+| Variável    | Descrição                                                                 |
+| ----------- | ------------------------------------------------------------------------- |
+| `NODE_ENV`  | Ambiente de execução (ex.: `production`).                                 |
+| `PORT`      | Porta do Express (a aplicação usa `3001`).                                |
+| `SMTP_USER` | Conta Gmail remetente do formulário de contato.                           |
+| `SMTP_PASS` | **App Password** do Gmail (não é a senha normal da conta).                |
+| `SMTP_TO`   | Destinatário das mensagens (opcional — se ausente, usa o próprio `SMTP_USER`). |
+| `IMAGE_TAG` | Tag da imagem de produção (uso futuro/CI; o Compose atual faz `build`).   |
+
+## 🛠️ Build e teste da imagem de produção
+
+O build é feito **dentro do Docker** pelo [`Dockerfile`](Dockerfile:1) multi-stage. Para testar localmente a mesma imagem usada em produção:
+
+```bash
+# Constrói a imagem e sobe o container de produção
+docker compose up -d --build
+
+# A aplicação fica disponível em http://localhost:3001/
+# Health check: http://localhost:3001/status  →  OK
+docker compose down
 ```
 
 ## 🚢 Deploy
 
-O site é **estático** e publicado no domínio via **CloudPanel (VPS) + extensão SFTP do VSCode**, com deploy automático a cada alteração salva (hot-reload). O guia completo está em **[DEPLOY.md](DEPLOY.md)** e cobre:
+O deploy é **manual e seguro (Nível 1 de DevOps)**: o código é versionado no GitHub e, na VPS, o container é reconstruído com Docker Compose. O guia completo está em **[DEPLOY.md](DEPLOY.md)** e cobre:
 
-- Estrutura de sites do CloudPanel (web root em `/home/<site>/htdocs/<dominio>/`)
-- Criação do site no CloudPanel (Runtime: **Static**) e emissão do SSL (Let's Encrypt)
-- Configuração do `sftp.json` apontando para o web root (upload automático ao salvar)
-- DNS apontando para a VPS (registro A sem proxy)
-- Atualizações futuras e solução de problemas
+- Pré-requisitos na VPS (Docker + Docker Compose v2, usuário do site)
+- Configuração do `.env` em produção (credenciais SMTP via Gmail App Password)
+- Fluxo de atualização: `git push` → `ssh` → `sudo -u jmattosdev git pull` → `docker compose up -d --build`
+- Verificação de saúde (`/status`), logs e solução de problemas
+
+Resumo do fluxo:
+
+```bash
+# 1. Local: desenvolver, testar e publicar no GitHub
+git add . && git commit -m "descrição da mudança" && git push
+
+# 2. Na VPS (via SSH), no diretório do projeto
+cd /home/jmattosdev/htdocs/jmattosdev.tech
+sudo -u jmattosdev git pull
+
+# 3. Reconstruir e arrancar o container
+docker compose up -d --build
+```
 
 ## 📁 Estrutura básica
 
 ```
 jmattosdev/
-├── index.html              # HTML principal (todas as seções)
-├── server.js               # Servidor Express: serve dist/ + API de contato (envia e-mail real via SMTP)
-├── package.json            # Dependências e scripts
-├── vite.config.js          # Config do Vite (plugin Tailwind v4)
-├── .gitignore              # Arquivos ignorados pelo Git
-├── DEPLOY.md               # Guia de deploy (CloudPanel + Express + SFTP)
-├── AI_GUIDELINES.md        # Regras e padrões para IAs do projeto
-├── plans/                  # Planos/arquitetura (ex.: modernizar-secao-contato.md)
-├── public/                 # Arquivos estáticos servidos na raiz
+├── index.html               # HTML principal (todas as seções)
+├── server.js                # Servidor Express: serve dist/ + API de contato (envia e-mail real via SMTP)
+├── package.json             # Dependências e scripts
+├── vite.config.js           # Config do Vite (plugin Tailwind v4)
+├── Dockerfile               # Build multi-stage (Vite → runtime Express, porta 3001)
+├── docker-compose.yml       # Orquestração de produção (VPS)
+├── docker-compose.dev.yml   # Orquestração de desenvolvimento (hot-reload com volumes)
+├── .env.example             # Modelo das variáveis de ambiente (o .env real não é versionado)
+├── .gitignore               # Arquivos ignorados pelo Git
+├── .dockerignore            # Arquivos ignorados no contexto de build da imagem
+├── DEPLOY.md                # Guia de deploy (VPS + Docker Compose)
+├── AI_GUIDELINES.md         # Regras e padrões para IAs do projeto
+├── plans/                   # Planos/arquitetura
+├── public/                  # Arquivos estáticos servidos na raiz
 │   ├── favicon.svg
 │   ├── jmattos.webp
-│   ├── og-image.svg        # Card Open Graph (1200x630) para compartilhamento
+│   ├── og-image.svg         # Card Open Graph (1200x630) para compartilhamento
 │   ├── robots.txt
 │   ├── sitemap.xml
-│   ├── icons/              # Ícones customizados (ex.: whatsapp.svg)
-│   └── screenshots/        # Screenshots dos projetos (projeto-1.gif, projeto-2.png)
+│   ├── icons/               # Ícones customizados (ex.: whatsapp.svg)
+│   └── screenshots/         # Screenshots dos projetos (projeto-1.gif, projeto-2.png)
 └── src/
     ├── css/
-    │   └── style.css       # Design tokens + Tailwind CSS v4 (CSS-first)
+    │   └── style.css        # Design tokens + Tailwind CSS v4 (CSS-first)
     └── js/
-        ├── main.js         # Ponto de entrada (ícones + renderização + menu)
-        ├── projects.js     # Renderiza a seção Projetos (com zoom Lightbox)
-        ├── servicos.js     # Renderiza a seção Serviços
-        ├── presenca.js     # Renderiza a seção Presença profissional
+        ├── main.js          # Ponto de entrada (ícones + renderização + menu)
+        ├── projects.js      # Renderiza a seção Projetos (com zoom Lightbox)
+        ├── servicos.js      # Renderiza a seção Serviços
+        ├── presenca.js      # Renderiza a seção Presença profissional
         ├── disponibilidade.js # Badge de disponibilidade + hub de caminhos (VAGA x PROJETO)
-        ├── contato.js      # Seção Contato: envio via API + feedback de status
-        ├── whatsapp.js     # Botão flutuante de WhatsApp (canto inferior direito)
-        ├── scrollspy.js    # Destaca o link da seção ativa na navbar
-        ├── lightbox.js     # Modal acessível para visualização ampliada de screenshots
-        ├── reveal.js       # Animação reveal on scroll
+        ├── contato.js       # Seção Contato: envio via API + feedback de status
+        ├── whatsapp.js      # Botão flutuante de WhatsApp (canto inferior direito)
+        ├── scrollspy.js     # Destaca o link da seção ativa na navbar
+        ├── lightbox.js      # Modal acessível para visualização ampliada de screenshots
+        ├── reveal.js        # Animação reveal on scroll
         ├── reveal-estrutural.js # Reveal direcional para blocos estruturais
-        └── data/           # Fontes únicas de verdade (dados)
+        └── data/            # Fontes únicas de verdade (dados)
             ├── projects.js
             ├── servicos.js
             ├── presenca.js

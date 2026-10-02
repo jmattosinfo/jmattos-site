@@ -40,9 +40,37 @@ Seções do site (ordem atual no `index.html`):
 | Ícones    | **Lucide** (via tree-shaking no bundle, importando apenas os usados)       |
 | Fontes    | Space Grotesk, Inter, JetBrains Mono (Google Fonts, com `preconnect`)      |
 | Backend   | Express (porta 3001) servindo `dist/` + `POST /api/contato` (envio de e-mail via Nodemailer + Gmail SMTP) |
-| Deploy    | CloudPanel / VPS (Nginx) — servidor Express (porta 3001) servindo `dist/` |
+| Runtime   | **Docker + Docker Compose** (Node.js 22 Alpine) — container único       |
+| Deploy    | VPS (Linux/Ubuntu) + Docker Compose (`docker compose up -d --build`)     |
 
-Scripts disponíveis (`package.json`): `npm run dev` · `npm run build` · `npm run preview` · `npm start` (Express: serve `dist/` + `POST /api/contato` — envia o e-mail real via SMTP).
+Scripts disponíveis (`package.json`): `npm run dev` · `npm run build` · `npm run preview` · `npm start` (Express: serve `dist/` + `POST /api/contato` — envia o e-mail real via SMTP). No fluxo atual, esses scripts são executados **dentro do container** (o Compose invoca `npm run dev` no ambiente de desenvolvimento e o [`Dockerfile`](Dockerfile:1) invoca `npm run build` no estágio *builder*).
+
+---
+
+## 🐳 Arquitetura e Infraestrutura
+
+> **O projeto é 100% conteinerizado.** Não há execução da aplicação diretamente no sistema operativo (sem `node server.js` no host, sem PM2, sem upload por FTP/SFTP). Toda a execução, instalação de dependências e gestão de processo acontece via **Docker/Docker Compose**.
+
+### Componentes
+
+| Ficheiro | Função |
+| --- | --- |
+| [`Dockerfile`](Dockerfile:1) | Build **multi-stage**: estágio `builder` (Node 22 Alpine + `npm ci` completo + `npm run build` → gera `dist/`) e estágio `runtime` (Node 22 Alpine + `npm ci --omit=dev` + [`server.js`](server.js) + `dist/`). Roda como usuário **não-root** (`USER node`), expõe a porta **3001** e tem `HEALTHCHECK` apontando para `GET /status`. |
+| [`docker-compose.yml`](docker-compose.yml:1) | **Produção** (VPS): faz `build` da imagem, publica `3001:3001`, carrega as variáveis via `env_file: .env` e usa `restart: always`. |
+| [`docker-compose.dev.yml`](docker-compose.dev.yml:1) | **Desenvolvimento**: usa `node:22-alpine`, monta o projeto como volume (`.:/app`) e roda `npm install && npm run dev` (Vite com hot-reload em `5173`). |
+| [`.dockerignore`](.dockerignore:1) | Exclui do contexto de build o que não pertence à imagem (`node_modules`, `dist`, `.git`, `.env`, `ecosystem.config.*`, docs `.md`). |
+| [`.env.example`](.env.example:1) | Modelo versionado das variáveis de ambiente. O `.env` real (com as credenciais SMTP) **não é versionado**. |
+
+### Regras de infraestrutura
+
+- **Comandos de execução/gestão devem usar o ecossistema Docker/Compose** — nunca `npm run dev`, `npm start` ou `pm2 ...` diretamente no host.
+  - Dev local: `docker compose -f docker-compose.dev.yml up -d`
+  - Produção/teste da imagem: `docker compose up -d --build` · logs: `docker compose logs -f` · parar: `docker compose down`
+- **Dependências**: instaladas dentro da imagem pelo `npm ci` do [`Dockerfile`](Dockerfile:1). Não executar `npm install` no host como parte do fluxo de execução/deploy.
+- **Porta**: a aplicação escuta sempre a **3001** (`process.env.PORT || 3001`) e o Compose mapeia `3001:3001`.
+- **Variáveis de ambiente**: injetadas pelo Compose via `env_file: .env`; **nunca** embutidas no `Dockerfile` nem versionadas.
+- **Deploy**: manual via Git + Compose na VPS — `git pull` e `docker compose up -d --build`. Detalhes em [DEPLOY.md](DEPLOY.md).
+- **Persistência**: a aplicação é **stateless** (sem banco de dados e sem volumes de dados); não adicionar volumes para estado.
 
 ---
 
@@ -153,8 +181,13 @@ jmattosdev/
 ├── server.js               # Express: serve dist/ + POST /api/contato
 ├── package.json            # Dependências e scripts
 ├── vite.config.js          # Config do Vite (plugin Tailwind v4)
-├── .gitignore
-├── DEPLOY.md               # Guia de deploy (CloudPanel + Express + SFTP)
+├── Dockerfile              # Build multi-stage (Vite → runtime Express, porta 3001)
+├── docker-compose.yml      # Orquestração de produção (VPS)
+├── docker-compose.dev.yml  # Orquestração de desenvolvimento (hot-reload)
+├── .gitignore              # Arquivos ignorados pelo Git
+├── .dockerignore           # Arquivos ignorados no build da imagem
+├── .env.example            # Modelo das variáveis de ambiente (o .env real não é versionado)
+├── DEPLOY.md               # Guia de deploy (VPS + Docker + Docker Compose)
 ├── AI_GUIDELINES.md        # Este arquivo
 ├── plans/                  # Planos/arquitetura (ex.: modernizar-secao-contato.md)
 ├── public/                 # Estáticos servidos na raiz

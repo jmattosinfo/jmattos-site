@@ -13,6 +13,7 @@
 // ============================================================
 import { disponibilidade } from "./data/disponibilidade.js";
 import { canais } from "./data/presenca.js";
+import { brandIcon } from "./brand-icons.js";
 
 // ---------- Utilitário de segurança ----------
 // Escapa caracteres especiais antes de inserir no HTML via innerHTML.
@@ -104,8 +105,8 @@ function cardVaga() {
         </a>
       </div>
       <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-4 text-sm">
-        ${linkedin ? `<a href="${escapeHTML(linkedin)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-primary-light transition-colors hover:text-foreground">LinkedIn<i data-lucide="arrow-up-right" class="h-4 w-4" aria-hidden="true"></i></a>` : ""}
-        ${github ? `<a href="${escapeHTML(github)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-primary-light transition-colors hover:text-foreground">GitHub<i data-lucide="arrow-up-right" class="h-4 w-4" aria-hidden="true"></i></a>` : ""}
+        ${linkedin ? `<a href="${escapeHTML(linkedin)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-primary-light transition-colors hover:text-foreground">${brandIcon("linkedin", "h-4 w-4")}LinkedIn</a>` : ""}
+        ${github ? `<a href="${escapeHTML(github)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-primary-light transition-colors hover:text-foreground">${brandIcon("github", "h-4 w-4")}GitHub</a>` : ""}
       </div>
     </article>`;
 }
@@ -157,14 +158,23 @@ export function initDisponibilidade() {
 
   // Links de canais do rodapé (fonte única: data/presenca.js)
   const canaisRodape = [
-    { seletor: "[data-canal-linkedin]", nome: "LinkedIn", externa: true },
-    { seletor: "[data-canal-github]", nome: "GitHub", externa: true },
-    { seletor: "[data-canal-whatsapp]", nome: "WhatsApp", externa: true },
-    { seletor: "[data-canal-email]", nome: "E-mail", externa: false },
+    { seletor: "[data-canal-linkedin]", nome: "LinkedIn", marca: "linkedin", externa: true },
+    { seletor: "[data-canal-github]", nome: "GitHub", marca: "github", externa: true },
+    { seletor: "[data-canal-whatsapp]", nome: "WhatsApp", marca: "whatsapp", externa: true },
+    { seletor: "[data-canal-email]", nome: "E-mail", marca: null, externa: false },
   ];
-  canaisRodape.forEach(({ seletor, nome, externa }) => {
+  canaisRodape.forEach(({ seletor, nome, marca, externa }) => {
     const el = document.querySelector(seletor);
     if (!el) return;
+
+    // Os links do rodapé têm apenas texto no HTML. Prependemos o logótipo
+    // OFICIAL de marca (redes sociais) sem destruir o nó de texto; as
+    // classes de layout alinham ícone e rótulo. O e-mail fica sem marca.
+    if (marca) {
+      el.classList.add("inline-flex", "items-center", "gap-2");
+      el.insertAdjacentHTML("afterbegin", brandIcon(marca, "h-4 w-4"));
+    }
+
     const url = urlCanal(nome);
     if (url) {
       el.href = url;

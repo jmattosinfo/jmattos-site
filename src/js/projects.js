@@ -6,10 +6,13 @@
 // apenas um container vazio (<div data-projetos>); todo o conteúdo
 // é gerado aqui.
 //
-// Os ícones são resolvidos pelo lucide via atributo data-lucide,
+// A maioria dos ícones é resolvida pelo lucide via atributo data-lucide,
 // por isso main.js chama createIcons NOVAMENTE após esta função.
+// EXCEÇÃO: o botão "Código no GitHub" usa o logótipo OFICIAL de marca
+// (src/js/brand-icons.js), que o Lucide não fornece.
 // ============================================================
 import { projetos } from "./data/projects.js";
+import { brandIcon } from "./brand-icons.js";
 
 // ---------- Utilitário de segurança ----------
 // Escapa caracteres especiais antes de inserir no HTML via innerHTML.
@@ -95,7 +98,7 @@ function botaoGitHub(projeto) {
       rel="noopener noreferrer"
       class="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
     >
-      <i data-lucide="folder-git-2" class="h-4 w-4" aria-hidden="true"></i>
+      ${brandIcon("github", "h-4 w-4")}
       Código no GitHub
     </a>`;
 }

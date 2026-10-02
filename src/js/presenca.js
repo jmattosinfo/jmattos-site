@@ -19,9 +19,14 @@
 //   "abre em nova aba" para quem usa leitor de tela.
 // • Os ícones são decorativos (aria-hidden="true"); o texto do
 //   link já comunica a ação.
-// • Os ícones são resolvidos pelo lucide via atributo data-lucide,
-//   por isso main.js chama createIcons APÓS esta função.
+//
+// ÍCONES — dois caminhos coexistem:
+// • Canais de rede social (canal.marca) → logótipo OFICIAL de marca
+//   via src/js/brand-icons.js (SVG inline, fill="currentColor").
+// • Demais canais (canal.icone) → ícone Lucide via data-lucide,
+//   resolvido por createIcons em main.js APÓS esta função.
 // ============================================================
+import { brandIcon } from "./brand-icons.js";
 import { canais } from "./data/presenca.js";
 
 // ---------- Utilitário de segurança ----------
@@ -76,10 +81,25 @@ function linkAcao(canal) {
     </p>`;
 }
 
+// ---------- Ícone do canal ----------
+// Rede social: logótipo oficial de marca (identidade da marca).
+// Demais canais: ícone Lucide genérico (resolvido por createIcons).
+// Em ambos os casos o tamanho/cor vêm do Tailwind (consistência visual).
+function iconeCanal(canal) {
+  const classe = "h-5 w-5 text-primary-light";
+
+  if (canal.marca) {
+    return brandIcon(canal.marca, classe);
+  }
+
+  return `<i data-lucide="${escapeHTML(canal.icone)}" class="${classe}" aria-hidden="true"></i>`;
+}
+
 // ---------- Card de um canal ----------
 // Layout de "diretório profissional": ícone em caixa discreta,
 // número pequeno, nome, descrição e link de ação com texto.
-// Estilo uniforme (sem cores de marca) — não parece coleção de botões.
+// Estilo uniforme (sem cores de marca nos demais canais) — não parece
+// coleção de botões; só as três redes sociais usam o logótipo oficial.
 function cardCanal(canal, indice) {
   const numero = String(indice + 1).padStart(2, "0");
 
@@ -88,7 +108,7 @@ function cardCanal(canal, indice) {
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-2">
-            <i data-lucide="${escapeHTML(canal.icone)}" class="h-5 w-5 text-primary-light" aria-hidden="true"></i>
+            ${iconeCanal(canal)}
           </span>
           <h3 class="text-lg">${escapeHTML(canal.nome)}</h3>
         </div>

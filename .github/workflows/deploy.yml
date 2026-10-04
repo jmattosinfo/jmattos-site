@@ -15,5 +15,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /home/jmattosdev/htdocs/jmattosdev.tech
-            sudo -u jmattosdev git pull
+            sudo -u jmattosdev git fetch origin
+            sudo -u jmattosdev git reset --hard origin/main
             docker compose up -d --build
